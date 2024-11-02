@@ -6,6 +6,10 @@ const p = {
 
     admin: (req, res) => {
         res.render('admin/admin');
+    },
+    
+    addForm: (req, res) => {
+        res.render('admin/add-product');
     }
 };
 
