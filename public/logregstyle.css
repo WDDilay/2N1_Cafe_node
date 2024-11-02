@@ -10,11 +10,11 @@
 body{
   min-height: 100vh;
   width: 100%;
-  background: #ffffff;
+  background: #2C3639;
 
 }
 header{
-  color: #fff;
+  color: #2C3639;
 }
 .signup{
   color: #fff;
@@ -25,9 +25,9 @@ header{
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
-  max-width: 430px;
-  width: 100%;
-  background: #051922;
+  max-width: 700px;
+  width: 700px;
+  background: #D9D9D9;
   border-radius: 7px;
   box-shadow: 0 5px 10px rgba(0,0,0,0.3);
 }
@@ -84,7 +84,7 @@ header{
   transition: 0.4s;
 }
 .form input.button:hover{
-  background: #051922;
+  background: #2C3639;
 }
 .signup{
   font-size: 17px;
@@ -97,3 +97,78 @@ header{
 .signup label:hover{
   text-decoration: underline;
 }
+
+/* Container styling */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 700px;
+  max-width: 700px;
+  background: #D9D9D9;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Form content layout */
+.form-content {
+  display: flex;
+  width: 100%;
+}
+
+/* Left Image Section */
+.image-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #333; /* Optional: background color in case the image doesn't cover */
+}
+
+.image-section img {
+  width: 350px;
+  height: 500px;
+  object-fit: cover;
+}
+
+/* Right Form Input Section */
+.input-section {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #D9D9D9;
+}
+
+.input-section form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-section form input {
+  height: 60px;
+  width: 250px;
+  padding: 0 15px;
+  font-size: 17px;
+  margin-bottom: 1.3rem;
+  border: 1px solid #242120;
+  border-radius: 10px;
+  outline: none;
+}
+
+.input-section form input.button {
+  background: #242120;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.4s;
+}
+
+.input-section form input.button:hover {
+  background: #2C3639;
+}
+
