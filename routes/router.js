@@ -3,6 +3,7 @@ const router = express.Router();
 const ucontroller = require('../controller/UserController.js');
 const pcontroller = require('../controller/ProductController.js');
 const ccontroller = require('../controller/Category.js');
+const mcontroller = require('../controller/MainController.js');
 
 
 //user routes
@@ -20,6 +21,10 @@ router.get('/add-form', pcontroller.addForm);
 router.get('/addcategory', ccontroller.addCategory);
 router.post('/addcategories', ccontroller.addCategories);
 router.post('/delete-category/:category_id', ccontroller.deleteCategory);
+
+//main routes
+
+router.get('/kiosk', mcontroller.kiosk);
 
 
 module.exports = router;
