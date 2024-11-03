@@ -19,6 +19,7 @@ router.get('/add-form', pcontroller.addForm);
 //category routes
 router.get('/addcategory', ccontroller.addCategory);
 router.post('/addcategories', ccontroller.addCategories);
+router.post('/delete-category/:category_id', ccontroller.deleteCategory);
 
 
 module.exports = router;

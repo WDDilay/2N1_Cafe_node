@@ -22,6 +22,15 @@ const c = {
         } else {
             res.render('/addcategory');
         }
+    },
+
+    deleteCategory: (req, res) => {
+        const categoryId = req.params.category_id;
+
+        category.delete(categoryId, (err, result) => {
+            if (err) throw err;
+            res.redirect('/product');  // After deletion, redirect back to the admin page
+        });
     }
 };
 
