@@ -2,6 +2,7 @@ const category = require('../models/CategoryModel.js');
 const db = require('../config/db.js');
 
 const c = {
+    
     addCategory: (req, res) => {
         res.render('admin/category')
     },
@@ -16,14 +17,12 @@ const c = {
                 return res.status(500).send("Error adding category");
             }
             
-            res.redirect('/addcategory');
+            res.redirect('/product');
         });
         } else {
-            res.render('/products');
+            res.render('/addcategory');
         }
     }
-
-
 };
 
 module.exports = c;

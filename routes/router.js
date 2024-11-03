@@ -5,12 +5,18 @@ const pcontroller = require('../controller/ProductController.js');
 const ccontroller = require('../controller/Category.js');
 
 
-
+//user routes
 router.get('/', ucontroller.main);
-router.get('/product', pcontroller.product);
 router.post('/login', ucontroller.login);
+
+
+//product routes
+router.get('/product', pcontroller.product);
 router.get('/admin', pcontroller.admin);
 router.get('/add-form', pcontroller.addForm);
+
+
+//category routes
 router.get('/addcategory', ccontroller.addCategory);
 router.post('/addcategories', ccontroller.addCategories);
 

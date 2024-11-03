@@ -1,7 +1,8 @@
 const user = require('../models/UserModel.js');
 const u = {
-    main:(req, res) => {
-        res.render('login');
+
+    main: (req, res) => {
+        res.render('login'); 
     },
 
     login: (req, res) => {

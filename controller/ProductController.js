@@ -1,7 +1,10 @@
 const product = require('../models/ProductModel.js');
 const p = {
     product: (req, res) => {
-        res.render('admin/products');
+        product.get((err, result) => {
+            if (err) throw err;
+            res.render('admin/products', { category: result }); 
+        });
     },
 
     admin: (req, res) => {
