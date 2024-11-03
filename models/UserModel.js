@@ -10,6 +10,6 @@ const user = {
             callback(null, results[0]);
         });
     }
-}
+};
 
 module.exports = user;

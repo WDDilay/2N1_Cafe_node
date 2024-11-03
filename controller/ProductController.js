@@ -12,7 +12,10 @@ const p = {
     },
     
     addForm: (req, res) => {
-        res.render('admin/add-product');
+        product.get((err, result) => {
+            if (err) throw err;
+            res.render('admin/add-product', { category: result }); 
+        });
     }
 };
 
