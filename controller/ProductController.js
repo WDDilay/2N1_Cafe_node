@@ -27,7 +27,6 @@ const p = {
     },
 
     addProducts: (req, res) => {
-        console.log("Category ID:", req.body.category_id);
         const { name, description} = req.body;
         const category_id = req.body.category_id;
         
