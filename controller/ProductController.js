@@ -1,9 +1,17 @@
 const product = require('../models/ProductModel.js');
 const p = {
     product: (req, res) => {
-        product.get((err, result) => {
+        product.get((err, categoryResult) => {
             if (err) throw err;
-            res.render('admin/products', { category: result }); 
+    
+            product.getProduct((err, productResult) => {
+                if (err) throw err;
+                
+                res.render('admin/products', { 
+                    category: categoryResult, 
+                    product: productResult 
+                });
+            });
         });
     },
 
@@ -45,6 +53,18 @@ const p = {
                 return res.status(500).send("Error adding product.");
             }
             res.redirect('/product'); // Redirect after successful insertion
+        });
+    },
+
+    deleteProduct: (req, res) => {
+        const productId = req.params.product_id;
+
+        product.deleteProduct(productId, (err) => {
+            if (err) {
+                console.error("Error deleting product:", err);
+                return res.status(500).send("Error deleting product.");
+            }
+            res.redirect('/product'); // Redirect after deletion
         });
     }
 };

@@ -66,8 +66,9 @@
                   <div class="form-group mb-3">
                     <label for="category">Category</label>
                     <select class="custom-select tm-select-accounts" id="category_id" name="category_id" required>
+                      <option value="">Select Category</option>
                       <% category.forEach(ca => { %>
-                          <option value="<%= ca.id %>"><%= ca.name %></option>
+                          <option value="<%= ca.category_id %>"><%= ca.category_name %></option>
                       <% }); %>
                   </select>
                 </div>

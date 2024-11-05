@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-
+const path = require('path');
 const ucontroller = require('../controller/UserController.js');
 const pcontroller = require('../controller/ProductController.js');
 const ccontroller = require('../controller/Category.js');
 const mcontroller = require('../controller/MainController.js');
 
 const multer = require('multer');
-const path = require('path');
+
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -34,13 +34,16 @@ router.post('/login', ucontroller.login);
 router.get('/product', pcontroller.product);
 router.get('/admin', pcontroller.admin);
 router.get('/add-form', pcontroller.addForm);
+router.post('/add-products', upload.single('product_image'), pcontroller.addProducts);
+router.post('/delete-product/:product_id', pcontroller.deleteProduct);
+
 
 
 //category routes
 router.get('/addcategory', ccontroller.addCategory);
 router.post('/addcategories', ccontroller.addCategories);
 router.post('/delete-category/:category_id', ccontroller.deleteCategory);
-router.post('/add-products', upload.single('product_image'), pcontroller.addProducts);
+
 
 //main routes
 
