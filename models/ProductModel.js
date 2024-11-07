@@ -16,8 +16,8 @@ const p = {
     getProduct: (callback) => {
         const query = `
             SELECT products.product_id, products.name AS name, products.description, products.product_image, categories.category_name AS category_name
-    FROM products
-    JOIN categories ON products.category_id = categories.category_id
+            FROM products
+            JOIN categories ON products.category_id = categories.category_id
         `;
         db.query(query, callback);
     },
