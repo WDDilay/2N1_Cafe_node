@@ -43,7 +43,7 @@
                   <% product.forEach(p => { %>
                   <tr>
                     <th scope="row"><input type="checkbox" /></th>
-                    <td class="tm-product-name"><%= p.name %></td>
+                    <td class="tm-product-name"data-product-id="<%= p.product_id %>"><%= p.name %></td>
                     <td><%= p.description %></td>
                     <td><img src="/uploads/<%= p.product_image %>" alt="Product Image" width="70"></td>
                     <td><%= p.category_name %></td>
@@ -63,9 +63,6 @@
             <a
               href="/add-form"
               class="btn btn-primary btn-block text-uppercase mb-3">Add new product</a>
-            <button class="btn btn-primary btn-block text-uppercase">
-              Delete selected products
-            </button>
           </div>
         </div>
         <div class="col-sm-12 col-md-12 col-lg-4 col-xl-4 tm-block-col">
@@ -113,10 +110,17 @@
     <!-- https://getbootstrap.com/ -->
     <script>
       $(function() {
-        $(".tm-product-name").on("click", function() {
-          window.location.href = "edit-product.html";
-        });
-      });
+    $(".tm-product-name").on("click", function() {
+        // Correctly access the data attribute
+        var productId = $(this).data("product-id");
+        if (productId) {
+            window.location.href = "/edit-products/" + productId;
+        } else {
+            console.log("Product ID not found");
+        }
+    });
+});
+
     </script>
   </body>
 </html>

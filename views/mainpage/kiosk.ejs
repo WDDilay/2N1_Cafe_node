@@ -26,20 +26,18 @@
 
             <!-- Categories Section -->
             <div class="categories">
+                <button data-category="all">All</button>
                 <% category.forEach(ca => { %>
-                <button><%= ca.category_name %></button>
+                    <button data-category="<%= ca.category_id %>"><%= ca.category_name %></button>
                 <% }) %>
             </div>
-
+            
             <!-- Product List Section -->
             <div class="product-list">
-                <!-- Sample Products -->
                 <% product.forEach(p => { %>
-                <div class="product-item">
-                    <img src="/uploads/<%= p.product_image %>" alt="Spanish Latte">
+                <div class="product-item" data-category-id="<%= p.category_id %>">
+                    <img src="/uploads/<%= p.product_image %>" alt="<%= p.name %>">
                     <p><%= p.name %></p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
                 </div>
                 <% }) %>
             </div>
@@ -97,6 +95,28 @@
             cartSection.classList.toggle("visible");
             mainContent.classList.toggle("shifted");
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const categoryButtons = document.querySelectorAll('.categories button');
+    const productItems = document.querySelectorAll('.product-item');
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const selectedCategory = button.getAttribute('data-category');
+
+            productItems.forEach(item => {
+                const productCategory = item.getAttribute('data-category-id');
+
+                if (selectedCategory === 'all' || productCategory === selectedCategory) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+
     </script>
 </body>
 </html>

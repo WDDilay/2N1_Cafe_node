@@ -43,6 +43,8 @@ router.post('/delete-product/:product_id', pcontroller.deleteProduct);
 router.get('/addcategory', ccontroller.addCategory);
 router.post('/addcategories', ccontroller.addCategories);
 router.post('/delete-category/:category_id', ccontroller.deleteCategory);
+router.get('/edit-products/:product_id', pcontroller.editProducts);
+router.post('/edit-product/:product_id', upload.single('product_image'), pcontroller.editProduct);
 
 
 //main routes

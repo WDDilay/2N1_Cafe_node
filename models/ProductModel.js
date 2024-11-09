@@ -49,6 +49,19 @@ const p = {
                 callback(null, result);
             });
         });
+    },
+
+    updateProduct: (product_id, data, callback) => {
+        const query = `
+            UPDATE products 
+            SET name = ?, description = ?, product_image = ?, category_id = ? 
+            WHERE product_id = ?`;
+        db.query(query, [data.name, data.description, data.product_image, data.category_id, product_id], callback);
+    },
+
+    getProductById: (product_id, callback) => {
+        const query = "SELECT * FROM products WHERE product_id = ?";
+        db.query(query, [product_id], callback);
     }
 };
 
