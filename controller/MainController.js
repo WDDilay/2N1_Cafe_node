@@ -1,6 +1,19 @@
+const product = require('../models/ProductModel.js');
+
 const m = {
     kiosk: (req, res) => {
-        res.render('mainpage/main');
+        product.get((err, categoryResult) => {
+            if (err) throw err;
+    
+            product.getProduct((err, productResult) => {
+                if (err) throw err;
+                
+                res.render('mainpage/kiosk', { 
+                    category: categoryResult, 
+                    product: productResult 
+                });
+            });
+        });
     }
 };
 

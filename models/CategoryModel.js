@@ -2,7 +2,7 @@ const db = require('../config/db.js');
 
 const c = {
     add: (data, callback) => {
-        const query = "INSERT INTO categories (name) VALUES (?)";
+        const query = "INSERT INTO categories (category_name) VALUES (?)";
         db.query(query,  [data.name], callback);
     },
 

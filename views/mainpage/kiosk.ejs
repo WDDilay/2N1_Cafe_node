@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kiosk System</title>
-    <link rel="stylesheet" href="/public/maincss/kiosk.css">
+    <link rel="stylesheet" href="maincss/kiosk.css">
 </head>
 <body>
     <div class="container">
@@ -26,54 +26,20 @@
 
             <!-- Categories Section -->
             <div class="categories">
-                <button>Nachos & Fries</button>
-                <button>Flavored Chicken</button>
-                <button>Croffle</button>
-                <button>Waffle</button>
-                <button>Iced Coffee</button>
-                <button>Milktea</button>
+                <button data-category="all">All</button>
+                <% category.forEach(ca => { %>
+                    <button data-category="<%= ca.category_id %>"><%= ca.category_name %></button>
+                <% }) %>
             </div>
-
+            
             <!-- Product List Section -->
             <div class="product-list">
-                <!-- Sample Products -->
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Spanish Latte">
-                    <p>Spanish Latte</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
+                <% product.forEach(p => { %>
+                <div class="product-item" data-category-id="<%= p.category_id %>">
+                    <img src="/uploads/<%= p.product_image %>" alt="<%= p.name %>">
+                    <p><%= p.name %></p>
                 </div>
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="French Vanilla">
-                    <p>French Vanilla</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Cafe Mocha">
-                    <p>Cafe Mocha</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <!-- Additional Sample Products -->
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Caramel Latte">
-                    <p>Caramel Latte</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Matcha Latte">
-                    <p>Matcha Latte</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Americano">
-                    <p>Americano</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
+                <% }) %>
             </div>
         </div>
 
@@ -129,6 +95,28 @@
             cartSection.classList.toggle("visible");
             mainContent.classList.toggle("shifted");
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const categoryButtons = document.querySelectorAll('.categories button');
+    const productItems = document.querySelectorAll('.product-item');
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const selectedCategory = button.getAttribute('data-category');
+
+            productItems.forEach(item => {
+                const productCategory = item.getAttribute('data-category-id');
+
+                if (selectedCategory === 'all' || productCategory === selectedCategory) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+
     </script>
 </body>
 </html>
