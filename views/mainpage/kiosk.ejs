@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiosk System</title>
+    <link rel="stylesheet" href="maincss/kiosk.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Main Content Section -->
+        <div class="main-content" id="main-content">
+            <!-- Top Navigation with Search and Cart Toggle -->
+            <div class="top-navigation">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search...">
+                    <button class="home-button">🏠</button>
+                    <button class="cart-button" onclick="toggleCart()">🛒</button>
+                </div>
+            </div>
+
+            <!-- Header Section with Brand Title -->
+            <div class="header">
+                <h1>2n1 Cafe Corp.</h1>
+            </div>
+
+            <!-- Categories Section -->
+            <div class="categories">
+                <button data-category="all">All</button>
+                <% category.forEach(ca => { %>
+                    <button data-category="<%= ca.category_id %>"><%= ca.category_name %></button>
+                <% }) %>
+            </div>
+            
+            <!-- Product List Section -->
+            <div class="product-list">
+                <% product.forEach(p => { %>
+                <div class="product-item" data-category-id="<%= p.category_id %>">
+                    <img src="/uploads/<%= p.product_image %>" alt="<%= p.name %>">
+                    <p><%= p.name %></p>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <!-- Cart Section (Initially Hidden) -->
+        <div class="cart-section" id="cart-section">
+            <h2>Your Cart</h2>
+            <div class="cart-item">
+                <img src="https://via.placeholder.com/50" alt="Chocolate Croffle">
+                <div class="cart-details">
+                    <p class="cart-product-name">Chocolate Croffle</p>
+                    <p class="cart-product-price">120.00</p>
+                    <div class="quantity-control">
+                        <button class="quantity-btn">-</button>
+                        <span>2</span>
+                        <button class="quantity-btn">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="cart-item">
+                <img src="https://via.placeholder.com/50" alt="Spanish Latte">
+                <div class="cart-details">
+                    <p class="cart-product-name">Spanish Latte</p>
+                    <p class="cart-product-price">49.00</p>
+                    <div class="quantity-control">
+                        <button class="quantity-btn">-</button>
+                        <span>1</span>
+                        <button class="quantity-btn">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="cart-summary">
+                <div>
+                    <span>Subtotal</span>
+                    <span>169.00</span>
+                </div>
+                <div>
+                    <span>Tax</span>
+                    <span>16.9</span>
+                </div>
+                <div class="total">
+                    <span>Total</span>
+                    <span>185.9</span>
+                </div>
+            </div>
+            <button class="pay-button">Pay Now</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleCart() {
+            const cartSection = document.getElementById("cart-section");
+            const mainContent = document.getElementById("main-content");
+            cartSection.classList.toggle("visible");
+            mainContent.classList.toggle("shifted");
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const categoryButtons = document.querySelectorAll('.categories button');
+    const productItems = document.querySelectorAll('.product-item');
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const selectedCategory = button.getAttribute('data-category');
+
+            productItems.forEach(item => {
+                const productCategory = item.getAttribute('data-category-id');
+
+                if (selectedCategory === 'all' || productCategory === selectedCategory) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+
+    </script>
+</body>
+</html>
