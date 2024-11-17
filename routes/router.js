@@ -28,6 +28,7 @@ const upload = multer({ storage: storage });
 //user routes
 router.get('/', ucontroller.main);
 router.post('/login', ucontroller.login);
+router.get('/account', ucontroller.account);
 
 
 //product routes
