@@ -16,8 +16,8 @@ const p = {
     getProduct: (callback) => {
         const query = `
             SELECT products.product_id, products.name AS name, products.description, products.product_image, categories.category_name AS category_name
-    FROM products
-    JOIN categories ON products.category_id = categories.category_id
+            FROM products
+            JOIN categories ON products.category_id = categories.category_id
         `;
         db.query(query, callback);
     },
@@ -49,6 +49,19 @@ const p = {
                 callback(null, result);
             });
         });
+    },
+
+    updateProduct: (product_id, data, callback) => {
+        const query = `
+            UPDATE products 
+            SET name = ?, description = ?, product_image = ?, category_id = ? 
+            WHERE product_id = ?`;
+        db.query(query, [data.name, data.description, data.product_image, data.category_id, product_id], callback);
+    },
+
+    getProductById: (product_id, callback) => {
+        const query = "SELECT * FROM products WHERE product_id = ?";
+        db.query(query, [product_id], callback);
     }
 };
 

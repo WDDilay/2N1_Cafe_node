@@ -23,6 +23,10 @@ const u = {
                 res.status(403).send("Access denied");
             }
         });
+    },
+
+    account: (req, res) => {
+        res.render('admin/account');
     }
 };
 

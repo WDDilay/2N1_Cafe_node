@@ -272,8 +272,8 @@ thead {
   padding-right: 15px;
 }
 .tm-col-account-settings {
-  max-width: 822px;
-  width: 63%;
+  max-width: 900px;
+  margin: 0 auto;
   padding-left: 15px;
   padding-right: 15px;
 }
