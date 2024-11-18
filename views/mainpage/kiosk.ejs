@@ -1,122 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiosk System</title>
-    <link rel="stylesheet" href="maincss/kiosk.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2n1 Self-Ordering Kiosk</title>
+  <link rel="stylesheet" href="maincss/kiosk.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Main Content Section -->
-        <div class="main-content" id="main-content">
-            <!-- Top Navigation with Search and Cart Toggle -->
-            <div class="top-navigation">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search...">
-                    <button class="home-button">🏠</button>
-                    <button class="cart-button" onclick="toggleCart()">🛒</button>
-                </div>
-            </div>
+  <header class="header">
+    <h1>2n1</h1>
+  </header>
+  <div class="main-container">
+    <!-- Categories Sidebar -->
+    <aside class="categories">
+      <h2>Categories</h2>
+      <ul id="category-list">
+        <li onclick="filterDishes('all')">
+          <img src="milktea.png" alt="Logo" class="category-logo"> All
+        </li>        
+        <% category.forEach(c => { %>
+        <li onclick="filterDishes(<%= c.category_id %>)">
+          <img src="milktea.png" alt="<%= c.category_name %> Logo" class="category-logo"> <%= c.category_name %>
+        </li>
+        <% }) %>
+      </ul>
+    </aside>
 
-            <!-- Header Section with Brand Title -->
-            <div class="header">
-                <h1>2n1 Cafe Corp.</h1>
-            </div>
-
-            <!-- Categories Section -->
-            <div class="categories">
-                <button data-category="all">All</button>
-                <% category.forEach(ca => { %>
-                    <button data-category="<%= ca.category_id %>"><%= ca.category_name %></button>
-                <% }) %>
-            </div>
-            
-            <!-- Product List Section -->
-            <div class="product-list">
-                <% product.forEach(p => { %>
-                <div class="product-item" data-category-id="<%= p.category_id %>">
-                    <img src="/uploads/<%= p.product_image %>" alt="<%= p.name %>">
-                    <p><%= p.name %></p>
-                </div>
-                <% }) %>
-            </div>
+    <!-- Dishes Section -->
+    <section class="dishes" id="dish-list">
+      
+      <% product.forEach(p => { %>
+      <div class="dish-item" onclick="addToOrder({ name: 'Spring Rolls', price: 5.99 })">
+        <img src="/uploads/<%= p.product_image %>" alt="Spring Rolls" class="dish-image">
+        <div class="dish-info">
+          <strong><%= p.name %></strong>
         </div>
+      </div>
+      <% }) %>
+    </section>
+  </div>
 
-        <!-- Cart Section (Initially Hidden) -->
-        <div class="cart-section" id="cart-section">
-            <h2>Your Cart</h2>
-            <div class="cart-item">
-                <img src="https://via.placeholder.com/50" alt="Chocolate Croffle">
-                <div class="cart-details">
-                    <p class="cart-product-name">Chocolate Croffle</p>
-                    <p class="cart-product-price">120.00</p>
-                    <div class="quantity-control">
-                        <button class="quantity-btn">-</button>
-                        <span>2</span>
-                        <button class="quantity-btn">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="cart-item">
-                <img src="https://via.placeholder.com/50" alt="Spanish Latte">
-                <div class="cart-details">
-                    <p class="cart-product-name">Spanish Latte</p>
-                    <p class="cart-product-price">49.00</p>
-                    <div class="quantity-control">
-                        <button class="quantity-btn">-</button>
-                        <span>1</span>
-                        <button class="quantity-btn">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="cart-summary">
-                <div>
-                    <span>Subtotal</span>
-                    <span>169.00</span>
-                </div>
-                <div>
-                    <span>Tax</span>
-                    <span>16.9</span>
-                </div>
-                <div class="total">
-                    <span>Total</span>
-                    <span>185.9</span>
-                </div>
-            </div>
-            <button class="pay-button">Pay Now</button>
-        </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-left">
+      <h3>Total: <span id="total-price">$0.00</span></h3>
     </div>
+    <div class="footer-center">
+      <ul id="order-list" class="scrollable"></ul>
+    </div>
+    <div class="footer-right">
+      <button id="review-order" onclick="reviewOrder()">Review Order</button>
+    </div>
+  </footer>
 
-    <script>
-        function toggleCart() {
-            const cartSection = document.getElementById("cart-section");
-            const mainContent = document.getElementById("main-content");
-            cartSection.classList.toggle("visible");
-            mainContent.classList.toggle("shifted");
-        }
+  <script>
+    async function filterDishes(category_id) {
+    try {
+        const response = await fetch(`/kiosk/products/${category_id}`);
+        const products = await response.json();
 
-        document.addEventListener('DOMContentLoaded', () => {
-    const categoryButtons = document.querySelectorAll('.categories button');
-    const productItems = document.querySelectorAll('.product-item');
+        const dishList = document.getElementById('dish-list');
+        dishList.innerHTML = ''; // Clear the existing product list
 
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const selectedCategory = button.getAttribute('data-category');
+        products.forEach(product => {
+            const dishItem = document.createElement('div');
+            dishItem.className = 'dish-item';
+            dishItem.onclick = () => addToOrder({ name: product.name, price: product.price });
 
-            productItems.forEach(item => {
-                const productCategory = item.getAttribute('data-category-id');
-
-                if (selectedCategory === 'all' || productCategory === selectedCategory) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+            dishItem.innerHTML = `
+                <img src="/uploads/${product.product_image}" alt="${product.name}" class="dish-image">
+                <div class="dish-info">
+                    <strong>${product.name}</strong>
+                </div>
+            `;
+            dishList.appendChild(dishItem);
         });
-    });
-});
+    } catch (error) {
+        console.error('Error fetching products by category:', error);
+    }
+}
 
-    </script>
+  </script>
 </body>
 </html>
