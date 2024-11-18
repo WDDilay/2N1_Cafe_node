@@ -123,4 +123,34 @@ body {
     border-radius: 5px;
     cursor: pointer;
   }
+
+  .dish-item {
+    transition: transform 0.3s ease-in-out; /* Smooth transition for scaling */
+  }
+  
+  .dish-item:hover {
+    transform: scale(1.1); /* Enlarge product on hover */
+  }
+
+  .modal {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000; /* Ensure it appears above other content */
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-content {
+    text-align: center;
+  }
+  
+  /* When the modal is not hidden, make it visible */
+  .modal:not(.hidden) {
+    display: block;
+  }
   

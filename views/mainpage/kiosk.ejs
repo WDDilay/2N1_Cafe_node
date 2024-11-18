@@ -8,7 +8,7 @@
 </head>
 <body>
   <header class="header">
-    <h1>2n1</h1>
+    <h1>2N1 Cafe</h1>
   </header>
   <div class="main-container">
     <!-- Categories Sidebar -->
@@ -25,15 +25,40 @@
         <% }) %>
       </ul>
     </aside>
-
+    
     <!-- Dishes Section -->
     <section class="dishes" id="dish-list">
-      
       <% product.forEach(p => { %>
-      <div class="dish-item" onclick="addToOrder({ name: 'Spring Rolls', price: 5.99 })">
-        <img src="/uploads/<%= p.product_image %>" alt="Spring Rolls" class="dish-image">
+      <div id="size-modal" class="modal hidden">
+        
+        <div class="modal-content">
+          <h2 id="product-name"><%= p.name %></h2>
+          <div>
+            <label>
+              <input type="radio" name="size" value="29" checked> Small - 29.00
+            </label>
+            <label>
+              <input type="radio" name="size" value="39"> Medium - 39.00
+            </label>
+            <label>
+              <input type="radio" name="size" value="49"> Large - 49.00
+            </label>
+          </div>
+          <div>
+            <label>Quantity: 
+              <input type="number" id="quantity" value="1" min="1">
+            </label>
+          </div>
+          <button>Add Order</button>
+          <button onclick="closeModal()">Back</button>
+        </div>
+      </div>
+      
+      
+        <div class="dish-item" onclick="openModal('<%= p.name %>')">
+        <img src="/uploads/<%= p.product_image %>" alt="<%= p.name %>" class="dish-image">
         <div class="dish-info">
-          <strong><%= p.name %></strong>
+          <strong class="name"><%= p.name %></strong>
         </div>
       </div>
       <% }) %>
@@ -79,6 +104,29 @@
         console.error('Error fetching products by category:', error);
     }
 }
+
+function openModal(productName) {
+  const modal = document.getElementById('size-modal');
+  const productNameElement = document.getElementById('product-name');
+
+  if (modal) {
+    productNameElement.textContent = productName; // Set product name
+    modal.classList.remove('hidden'); // Show modal
+  } else {
+    console.error('Modal element not found!');
+  }
+}
+
+function closeModal() {
+  const modal = document.getElementById('size-modal');
+  if (modal) {
+    modal.classList.add('hidden'); // Add 'hidden' class to hide the modal
+  } else {
+    console.error('Modal element not found!');
+  }
+}
+
+
 
   </script>
 </body>
