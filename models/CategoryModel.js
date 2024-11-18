@@ -13,7 +13,6 @@ const c = {
                 console.error('Error deleting category:', err);
                 return callback(err, null);
             }
-            // Call callback with result if successful
             callback(null, result);
         });
     } 

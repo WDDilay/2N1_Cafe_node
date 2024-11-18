@@ -15,67 +15,28 @@
     <aside class="categories">
       <h2>Categories</h2>
       <ul id="category-list">
-        <li onclick="filterDishes('Appetizers')">
-          <img src="images/appetizers.png" alt="Appetizers Logo" class="category-logo"> Appetizers
+        <li onclick="filterDishes('all')">
+          <img src="milktea.png" alt="Logo" class="category-logo"> All
+        </li>        
+        <% category.forEach(c => { %>
+        <li onclick="filterDishes(<%= c.category_id %>)">
+          <img src="milktea.png" alt="<%= c.category_name %> Logo" class="category-logo"> <%= c.category_name %>
         </li>
-        <li onclick="filterDishes('Main Course')">
-          <img src="images/main_course.png" alt="Main Course Logo" class="category-logo"> Main Course
-        </li>
-        <li onclick="filterDishes('Desserts')">
-          <img src="images/desserts.png" alt="Desserts Logo" class="category-logo"> Desserts
-        </li>
-        <li onclick="filterDishes('Beverages')">
-          <img src="images/beverages.png" alt="Beverages Logo" class="category-logo"> Beverages
-        </li>
+        <% }) %>
       </ul>
     </aside>
 
     <!-- Dishes Section -->
     <section class="dishes" id="dish-list">
       
-      <!-- Dishes with Images -->
+      <% product.forEach(p => { %>
       <div class="dish-item" onclick="addToOrder({ name: 'Spring Rolls', price: 5.99 })">
-        <img src="images/spring_rolls.jpg" alt="Spring Rolls" class="dish-image">
+        <img src="/uploads/<%= p.product_image %>" alt="Spring Rolls" class="dish-image">
         <div class="dish-info">
-          <strong>Spring Rolls</strong>
-          <p>$5.99</p>
+          <strong><%= p.name %></strong>
         </div>
       </div>
-      <div class="dish-item" onclick="addToOrder({ name: 'Caesar Salad', price: 6.99 })">
-        <img src="images/caesar_salad.jpg" alt="Caesar Salad" class="dish-image">
-        <div class="dish-info">
-          <strong>Caesar Salad</strong>
-          <p>$6.99</p>
-        </div>
-      </div>
-      <div class="dish-item" onclick="addToOrder({ name: 'Steak', price: 14.99 })">
-        <img src="images/steak.jpg" alt="Steak" class="dish-image">
-        <div class="dish-info">
-          <strong>Steak</strong>
-          <p>$14.99</p>
-        </div>
-      </div>
-      <div class="dish-item" onclick="addToOrder({ name: 'Pasta', price: 12.99 })">
-        <img src="images/pasta.jpg" alt="Pasta" class="dish-image">
-        <div class="dish-info">
-          <strong>Pasta</strong>
-          <p>$12.99</p>
-        </div>
-      </div>
-      <div class="dish-item" onclick="addToOrder({ name: 'Ice Cream', price: 4.99 })">
-        <img src="images/ice_cream.jpg" alt="Ice Cream" class="dish-image">
-        <div class="dish-info">
-          <strong>Ice Cream</strong>
-          <p>$4.99</p>
-        </div>
-      </div>
-      <div class="dish-item" onclick="addToOrder({ name: 'Coffee', price: 3.49 })">
-        <img src="images/coffee.jpg" alt="Coffee" class="dish-image">
-        <div class="dish-info">
-          <strong>Coffee</strong>
-          <p>$3.49</p>
-        </div>
-      </div>
+      <% }) %>
     </section>
   </div>
 
@@ -93,33 +54,32 @@
   </footer>
 
   <script>
-    let order = [];
+    async function filterDishes(category_id) {
+    try {
+        const response = await fetch(`/kiosk/products/${category_id}`);
+        const products = await response.json();
 
-    function addToOrder(dish) {
-      order.push(dish);
-      updateOrderSummary();
-    }
+        const dishList = document.getElementById('dish-list');
+        dishList.innerHTML = ''; // Clear the existing product list
 
-    function updateOrderSummary() {
-      const orderList = document.getElementById("order-list");
-      orderList.innerHTML = "";
-      let totalPrice = 0;
-      order.forEach(dish => {
-        totalPrice += dish.price;
-        const orderItem = document.createElement("li");
-        orderItem.textContent = `${dish.name} - $${dish.price.toFixed(2)}`;
-        orderList.appendChild(orderItem);
-      });
-      document.getElementById("total-price").textContent = `$${totalPrice.toFixed(2)}`;
-    }
+        products.forEach(product => {
+            const dishItem = document.createElement('div');
+            dishItem.className = 'dish-item';
+            dishItem.onclick = () => addToOrder({ name: product.name, price: product.price });
 
-    function reviewOrder() {
-      alert("Review your order: \n" + order.map(dish => dish.name).join(", "));
+            dishItem.innerHTML = `
+                <img src="/uploads/${product.product_image}" alt="${product.name}" class="dish-image">
+                <div class="dish-info">
+                    <strong>${product.name}</strong>
+                </div>
+            `;
+            dishList.appendChild(dishItem);
+        });
+    } catch (error) {
+        console.error('Error fetching products by category:', error);
     }
+}
 
-    function filterDishes(category) {
-      alert(`Filtered dishes for: ${category}`); // Dummy functionality for filtering.
-    }
   </script>
 </body>
 </html>
