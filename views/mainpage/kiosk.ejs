@@ -28,41 +28,37 @@
     
     <!-- Dishes Section -->
     <section class="dishes" id="dish-list">
-      <% product.forEach(p => { %>
-      <div id="size-modal" class="modal hidden">
-        
-        <div class="modal-content">
-          <h2 id="product-name"><%= p.name %></h2>
-          <div>
-            <label>
-              <input type="radio" name="size" value="29" checked> Small - 29.00
-            </label>
-            <label>
-              <input type="radio" name="size" value="39"> Medium - 39.00
-            </label>
-            <label>
-              <input type="radio" name="size" value="49"> Large - 49.00
-            </label>
-          </div>
-          <div>
-            <label>Quantity: 
-              <input type="number" id="quantity" value="1" min="1">
-            </label>
-          </div>
-          <button>Add Order</button>
-          <button onclick="closeModal()">Back</button>
-        </div>
+      <!-- Modal for each product -->
+<% product.forEach(p => { %>
+  <div id="size-modal-<%= p.product_id %>" class="modal hidden" data-id="<%= p.product_id %>">
+    <div class="modal-content">
+      <h2 id="product-name"><%= p.name %></h2>
+      <div id="modal-options">
+        <!-- Dynamic content will go here based on product type -->
       </div>
-      
-      
-        <div class="dish-item" onclick="openModal('<%= p.name %>')">
-        <img src="/uploads/<%= p.product_image %>" alt="<%= p.name %>" class="dish-image">
-        <div class="dish-info">
-          <strong class="name"><%= p.name %></strong>
-        </div>
+      <div>
+        <label>Quantity: 
+          <input type="number" id="quantity-<%= p.id %>" value="1" min="1">
+        </label>
       </div>
-      <% }) %>
+      <button onclick="addToOrder(<%= p.id %>)">Add Order</button>
+      <button onclick="closeModal(<%= p.id %>)">Back</button>
+    </div>
+  </div>
+  <% }) %>
+  
+  <!-- Dish Item (Clickable to open modal) -->
+  <% product.forEach(p => { %>
+    <div class="dish-item" onclick="openModal(<%= JSON.stringify(p) %>)">
+      <img src="/uploads/<%= p.product_image %>" alt="<%= p.name %>" class="dish-image">
+      <div class="dish-info">
+        <strong class="name"><%= p.name %></strong>
+      </div>
+    </div>
+    <% }) %>
+  
     </section>
+    
   </div>
 
   <!-- Footer -->
@@ -79,18 +75,19 @@
   </footer>
 
   <script>
+    // Fetch dishes based on selected category
     async function filterDishes(category_id) {
     try {
         const response = await fetch(`/kiosk/products/${category_id}`);
         const products = await response.json();
-
+        console.log('Fetched Products:', products); // Log products
         const dishList = document.getElementById('dish-list');
         dishList.innerHTML = ''; // Clear the existing product list
 
         products.forEach(product => {
             const dishItem = document.createElement('div');
             dishItem.className = 'dish-item';
-            dishItem.onclick = () => addToOrder({ name: product.name, price: product.price });
+            dishItem.onclick = () => openModal(product);
 
             dishItem.innerHTML = `
                 <img src="/uploads/${product.product_image}" alt="${product.name}" class="dish-image">
@@ -105,28 +102,63 @@
     }
 }
 
-function openModal(productName) {
-  const modal = document.getElementById('size-modal');
-  const productNameElement = document.getElementById('product-name');
 
+// Open the modal for the selected product
+function openModal(product) {
+    const modal = document.getElementById(`size-modal-${product.product_id}`);  // Use the correct product ID
+    const modalOptions = document.getElementById('modal-options');
+
+    if (!modal || !modalOptions) {
+        console.error('Modal elements not found!');
+        return;
+    }
+
+    // Clear existing modal content
+    modalOptions.innerHTML = '';
+
+    // Populate modal content based on product type
+    if (product.type.toLowerCase() === 'beverage') {
+        modalOptions.innerHTML = `
+            <div>
+                <label><input type="radio" name="size" value="29" checked> Small - 29.00</label>
+                <label><input type="radio" name="size" value="39"> Medium - 39.00</label>
+                <label><input type="radio" name="size" value="49"> Large - 49.00</label>
+            </div>
+        `;
+    } else if (product.type.toLowerCase() === 'food') {
+        modalOptions.innerHTML = `
+            <div>
+                <label>Price: ${product.price}</label>
+            </div>
+        `;
+    } else {
+        console.error('Unknown product type:', product.type);
+        return;
+    }
+
+    // Show the modal
+    modal.classList.remove('hidden');
+}
+
+// Add product to the order
+function addToOrder(productId) {
+    const quantity = document.getElementById(`quantity-${productId}`).value; // Use dynamic quantity input id
+    // Add logic to handle adding to the order
+    console.log(`Added product ${productId} with quantity ${quantity}`);
+    closeModal(productId);
+}
+
+
+
+// Close the modal
+function closeModal(productId) {
+  const modal = document.getElementById(`size-modal-${productId}`);
   if (modal) {
-    productNameElement.textContent = productName; // Set product name
-    modal.classList.remove('hidden'); // Show modal
+    modal.classList.add('hidden');
   } else {
     console.error('Modal element not found!');
   }
 }
-
-function closeModal() {
-  const modal = document.getElementById('size-modal');
-  if (modal) {
-    modal.classList.add('hidden'); // Add 'hidden' class to hide the modal
-  } else {
-    console.error('Modal element not found!');
-  }
-}
-
-
 
   </script>
 </body>

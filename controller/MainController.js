@@ -5,7 +5,7 @@ const m = {
     kiosk: (req, res) => {
         product.get((err, categoryResult) => {
             if (err) throw err;
-    
+            console.log("Fetched Categories: ", categoryResult);
             product.getProduct((err, productResult) => {
                 if (err) throw err;
                 
@@ -26,6 +26,7 @@ const m = {
                     console.error('Error fetching all products:', err);
                     return res.status(500).json({ error: 'Failed to fetch products.' });
                 }
+                console.log("Fetched All Products: ", results); 
                 res.json(results); 
             });
         } else {
