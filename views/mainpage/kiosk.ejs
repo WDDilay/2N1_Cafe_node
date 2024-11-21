@@ -4,162 +4,213 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Menu</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f5f0ed;
-        }
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-        .sidebar {
-            width: 80px;
-            background-color: #3c2f2f;
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-        .logo {
-            width: 50px;
-            height: 50px;
-            background-color: #d1b5a9;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .logo::after {
-            content: '';
-            width: 25px;
-            height: 25px;
-            background-color: #3c2f2f;
-            border-radius: 50%;
-        }
-        .category-btn {
-            width: 100%;
-            padding: 10px 0;
-            background-color: #f5f0ed;
-            border: none;
-            border-radius: 8px;
-            color: #3c2f2f;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .category-btn:hover {
-            background-color: #e0d5cc;
-        }
-        .main-content {
-            flex-grow: 1;
-            padding: 30px;
-        }
-        .search-container {
-            position: relative;
-            margin-bottom: 30px;
-        }
-        .search-input {
-            width: 100%;
-            padding: 12px 20px 12px 40px;
-            border: none;
-            border-radius: 25px;
-            background-color: #e0d5cc;
-            font-size: 16px;
-        }
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
-        }
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        .menu-item {
-            background-color: #e0d5cc;
-            border-radius: 10px;
-            overflow: hidden;
-            text-align: center;
-        }
-        .menu-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-        .menu-item h3 {
-            margin: 10px 0 5px;
-            color: #3c2f2f;
-        }
-        .menu-item p {
-            margin: 0 0 10px;
-            color: #3c2f2f;
-        }
-    </style>
+    <link rel="stylesheet" href="maincss/kiosk.css">
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <div class="logo"></div>
-            <button class="category-btn">All</button>
-            <button class="category-btn">Rice</button>
-            <button class="category-btn">Chicken</button>
-            <button class="category-btn">Burgers</button>
-            <button class="category-btn">Pasta</button>
-        </div>
-        <div class="main-content">
+        <nav class="sidebar">
+            <div class="logo" role="img" aria-label="Restaurant logo"></div>
+            <button class="category-btn" data-category-id="all">All</button>
+            <% category.forEach(ca => { %>
+            <button class="category-btn" data-category-id="<%= ca.category_id %>"><%= ca.category_name %></button>
+            <% }) %>
+        </nav>
+        <main class="main-content">
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search for items...">
-                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search for items..." aria-label="Search for menu items">
+                <span class="search-icon" aria-hidden="true">🔍</span>
             </div>
-            <div class="menu-grid">
-                <div class="menu-item">
-                    <img src="/placeholder.svg?height=150&width=200" alt="Carbonara">
-                    <h3>Carbonara</h3>
-                    <p>₱ 125.00</p>
-                </div>
-                <div class="menu-item">
-                    <img src="/placeholder.svg?height=150&width=200" alt="Fried Bangus">
-                    <h3>Fried Bangus</h3>
-                    <p>₱ 139.00</p>
-                </div>
-                <div class="menu-item">
-                    <img src="/placeholder.svg?height=150&width=200" alt="Parmesan Chicken">
-                    <h3>Parmesan Chicken</h3>
-                    <p>₱ 129.00</p>
-                </div>
-                <div class="menu-item">
-                    <img src="/placeholder.svg?height=150&width=200" alt="Overload">
-                    <h3>Overload</h3>
-                    <p>₱ 149.00</p>
-                </div>
-                <div class="menu-item">
-                    <img src="/placeholder.svg?height=150&width=200" alt="Spaghetti">
-                    <h3>Spaghetti</h3>
-                    <p>₱ 125.00</p>
-                </div>
-                <div class="menu-item">
-                    <img src="/placeholder.svg?height=150&width=200" alt="Buttered Squid">
-                    <h3>Buttered Squid</h3>
-                    <p>₱ 129.00</p>
-                </div>
-                <div class="menu-item">
-                    <img src="/placeholder.svg?height=150&width=200" alt="Shrimp Pasta">
-                    <h3>Shrimp Pasta</h3>
-                    <p>₱ 125.00</p>
-                </div>
-                <div class="menu-item">
-                    <img src="/placeholder.svg?height=150&width=200" alt="Buffalo Shrimp">
-                    <h3>Buffalo Shrimp</h3>
-                    <p>₱ 139.00</p>
+            <div class="menu-grid-container">
+                <div class="menu-grid">
+                    <% product.forEach(p => { %>
+                    <div class="menu-item"data-name="<%= p.name %>" 
+                        data-price="<%= p.price %>" 
+                        data-image="/uploads/<%= p.product_image %>">
+                        <img src="/uploads/<%= p.product_image %>" alt="Carbonara">
+                        <h3><%= p.name %></h3>
+                    </div>
+                    <% }) %>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Fried Bangus">
+                        <h3>Fried Bangus</h3>
+                        <p>₱ 139.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Parmesan Chicken">
+                        <h3>Parmesan Chicken</h3>
+                        <p>₱ 129.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Overload">
+                        <h3>Overload</h3>
+                        <p>₱ 149.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Spaghetti">
+                        <h3>Spaghetti</h3>
+                        <p>₱ 125.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Buttered Squid">
+                        <h3>Buttered Squid</h3>
+                        <p>₱ 129.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Shrimp Pasta">
+                        <h3>Shrimp Pasta</h3>
+                        <p>₱ 125.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Buffalo Shrimp">
+                        <h3>Buffalo Shrimp</h3>
+                        <p>₱ 139.00</p>
+                    </div>
+                    <!-- Additional menu items to demonstrate scrolling -->
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Grilled Salmon">
+                        <h3>Grilled Salmon</h3>
+                        <p>₱ 189.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Beef Steak">
+                        <h3>Beef Steak</h3>
+                        <p>₱ 199.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Vegetable Stir Fry">
+                        <h3>Vegetable Stir Fry</h3>
+                        <p>₱ 109.00</p>
+                    </div>
+                    <div class="menu-item">
+                        <img src="/placeholder.svg?height=150&width=200" alt="Chicken Alfredo">
+                        <h3>Chicken Alfredo</h3>
+                        <p>₱ 135.00</p>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div id="product-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2 id="modal-title">Product Name</h2>
+                    <img id="modal-image" src="" alt="Product Image">
+                    <div class="quantity-control">
+                        <button id="decrease-qty" class="qty-btn">-</button>
+                        <span id="quantity">1</span>
+                        <button id="increase-qty" class="qty-btn">+</button>
+                    </div>
+                    <p id="modal-price">₱ 0.00</p>
+                    <button id="add-to-order" class="modal-btn">Add to Order</button>
+                    <button id="cancel-modal" class="modal-btn cancel-btn">Cancel</button>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="total-cost">Total: ₱ 0.00</div>
+                <div class="order-summary">
+                    <!-- Order summary will be populated dynamically -->
+                </div>
+                <button class="review-order-btn">Review Order</button>
+            </footer>
+        </main>
     </div>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const menuGrid = document.querySelector('.menu-grid');
+        const modal = document.getElementById('product-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalImage = document.getElementById('modal-image');
+        const modalPrice = document.getElementById('modal-price');
+        const quantityDisplay = document.getElementById('quantity');
+        const addToOrderBtn = document.getElementById('add-to-order');
+        const cancelModalBtn = document.getElementById('cancel-modal');
+        const decreaseQtyBtn = document.getElementById('decrease-qty');
+        const increaseQtyBtn = document.getElementById('increase-qty');
+
+        let currentQuantity = 1;
+
+        // Attach click event to category buttons
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const categoryId = button.getAttribute('data-category-id');
+
+                fetch(`/kiosk/products/${categoryId}`)
+                    .then(response => response.json())
+                    .then(products => {
+                        // Clear the menu grid
+                        menuGrid.innerHTML = '';
+
+                        // Populate the menu grid with the new products
+                        products.forEach(product => {
+                            const menuItem = `
+                                <div class="menu-item" 
+                                    data-name="${product.name}" 
+                                    data-price="${product.price}" 
+                                    data-image="/uploads/${product.product_image}">
+                                    <img src="/uploads/${product.product_image}" alt="${product.name}">
+                                    <h3>${product.name}</h3>
+                                </div>
+                            `;
+                            menuGrid.innerHTML += menuItem;
+                        });
+
+                        // Re-bind click events to new menu items
+                        attachMenuItemEvents();
+                    })
+                    .catch(error => console.error('Error fetching products:', error));
+            });
+        });
+
+        // Function to attach modal events to menu items
+        function attachMenuItemEvents() {
+            const menuItems = document.querySelectorAll('.menu-item');
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const name = item.getAttribute('data-name');
+                    const price = item.getAttribute('data-price');
+                    const image = item.getAttribute('data-image');
+
+                    modalTitle.textContent = name;
+                    modalImage.src = image;
+                    modalPrice.textContent = `₱ ${price}`;
+                    currentQuantity = 1;
+                    quantityDisplay.textContent = currentQuantity;
+
+                    modal.classList.remove('hidden');
+                });
+            });
+        }
+
+        // Adjust quantity
+        increaseQtyBtn.addEventListener('click', () => {
+            currentQuantity++;
+            quantityDisplay.textContent = currentQuantity;
+        });
+
+        decreaseQtyBtn.addEventListener('click', () => {
+            if (currentQuantity > 1) {
+                currentQuantity--;
+                quantityDisplay.textContent = currentQuantity;
+            }
+        });
+
+        // Add to order (example functionality)
+        addToOrderBtn.addEventListener('click', () => {
+            console.log(`Added to order: ${modalTitle.textContent}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
+            modal.classList.add('hidden');
+        });
+
+        // Close modal
+        cancelModalBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // Initial binding for the default category (loaded on page load)
+        attachMenuItemEvents(); // <--- This binds events to menu items on the initial render
+    });
+</script>
+
+
+
+
 </html>
