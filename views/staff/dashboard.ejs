@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="dashboard">
+        <h2>Staff Dashboard</h2>
+        <!-- Attendance Section -->
+        <section id="attendance">
+           <h3>Attendance</h3>
+           <table>
+              <thead>
+                 <tr><th>Name</th><th>Date</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                 <% attendanceData.forEach((entry) => { %>
+                    <tr>
+                       <td><%= entry.name %></td>
+                       <td><%= entry.date %></td>
+                       <td><%= entry.status %></td>
+                    </tr>
+                 <% }) %>
+              </tbody>
+           </table>
+        </section>
+        
+        <!-- Sales Report Section -->
+        <section id="sales-report">
+           <h3>Sales Report</h3>
+           <select id="report-category">
+              <option value="daily">Daily Report</option>
+              <option value="best-seller">Best Seller</option>
+           </select>
+           <canvas id="salesChart"></canvas>
+        </section>
+     </div>
+     
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <script>
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+           type: 'bar',
+           data: {
+              labels: [], // Populate labels dynamically
+              datasets: [{
+                 label: 'Sales',
+                 data: [], // Populate data dynamically
+                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                 borderColor: 'rgba(75, 192, 192, 1)',
+                 borderWidth: 1
+              }]
+           },
+           options: { scales: { y: { beginAtZero: true } } }
+        });
+     </script>
+          
+</body>
+</html>
