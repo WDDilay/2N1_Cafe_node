@@ -9,18 +9,18 @@ const c = {
 
     addCategories: (req, res) => {
         if (req.method === 'POST') {
-            const { name } = req.body;
+            const { name, type } = req.body;
     
-            category.add({name}, (err, results) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).send("Error adding category");
-            }
-            
-            res.redirect('/product');
-        });
+            category.add({ name, type }, (err, results) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send("Error adding category");
+                }
+    
+                res.redirect('/product');
+            });
         } else {
-            res.render('/addcategory');
+            res.render('/addcategory'); // Fix the path if necessary
         }
     },
 

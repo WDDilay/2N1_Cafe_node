@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kiosk System</title>
-    <link rel="stylesheet" href="/public/maincss/kiosk.css">
+    <link rel="stylesheet" href="maincss/kiosk.css">
 </head>
 <body>
     <!-- Top Header with Cafe Name -->
@@ -13,121 +13,115 @@
     </header>
 
     <div class="container">
-        <!-- Sidebar with Category Image and Buttons -->
-        <aside class="sidebar">
-            <button class="category-btn">
-                <img src="https://via.placeholder.com/50" alt="Nachos & Fries">
-                <span>Nachos & Fries</span>
-            </button>
-            <button class="category-btn">
-                <img src="https://via.placeholder.com/50" alt="Flavored Chicken">
-                <span>Flavored Chicken</span>
-            </button>
-            <button class="category-btn">
-                <img src="https://via.placeholder.com/50" alt="Croffle">
-                <span>Croffle</span>
-            </button>
-            <button class="category-btn">
-                <img src="https://via.placeholder.com/50" alt="Waffle">
-                <span>Waffle</span>
-            </button>
-            <button class="category-btn">
-                <img src="https://via.placeholder.com/50" alt="Iced Coffee">
-                <span>Iced Coffee</span>
-            </button>
-            <button class="category-btn">
-                <img src="https://via.placeholder.com/50" alt="Milktea">
-                <span>Milktea</span>
-            </button>
-        </aside>
-
         <!-- Main Content Section -->
-        <div class="main-content">
-            <!-- Product List Section with Scrollable Area -->
-            <div class="product-list">
-                <!-- Sample Products (3 per row) -->
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Spanish Latte">
-                    <p>Spanish Latte</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="French Vanilla">
-                    <p>French Vanilla</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Cafe Mocha">
-                    <p>Cafe Mocha</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <!-- Additional Sample Products for Scroll -->
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Caramel Latte">
-                    <p>Caramel Latte</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Matcha Latte">
-                    <p>Matcha Latte</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
-                </div>
-                <div class="product-item">
-                    <img src="https://via.placeholder.com/80x100" alt="Americano">
-                    <p>Americano</p>
-                    <span>49.00</span>
-                    <button class="add-button">+</button>
+        <div class="main-content" id="main-content">
+            <!-- Top Navigation with Search and Cart Toggle -->
+            <div class="top-navigation">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search...">
+                    <button class="home-button">🏠</button>
+                    <button class="cart-button" onclick="toggleCart()">🛒</button>
                 </div>
             </div>
 
-            <!-- Initially Hidden Cart Section -->
-            <div class="cart-section" id="cart-section">
-                <!-- Sample Cart Items -->
-                <div class="cart-item">
-                    <img src="https://via.placeholder.com/50" alt="Chocolate Croffle">
-                    <div class="cart-details">
-                        <p class="cart-product-name">Chocolate Croffle</p>
-                        <p class="cart-product-price">120.00</p>
-                        <div class="quantity-control">
-                            <button class="quantity-btn">-</button>
-                            <span>2</span>
-                            <button class="quantity-btn">+</button>
-                        </div>
-                    </div>
+            <!-- Header Section with Brand Title -->
+            <div class="header">
+                <h1>2n1 Cafe Corp.</h1>
+            </div>
+
+            <!-- Categories Section -->
+            <div class="categories">
+                <button data-category="all">All</button>
+                <% category.forEach(ca => { %>
+                    <button data-category="<%= ca.category_id %>"><%= ca.category_name %></button>
+                <% }) %>
+            </div>
+            
+            <!-- Product List Section -->
+            <div class="product-list">
+                <% product.forEach(p => { %>
+                <div class="product-item" data-category-id="<%= p.category_id %>">
+                    <img src="/uploads/<%= p.product_image %>" alt="<%= p.name %>">
+                    <p><%= p.name %></p>
                 </div>
-                <div class="cart-item">
-                    <img src="https://via.placeholder.com/50" alt="Spanish Latte">
-                    <div class="cart-details">
-                        <p class="cart-product-name">Spanish Latte</p>
-                        <p class="cart-product-price">49.00</p>
-                        <div class="quantity-control">
-                            <button class="quantity-btn">-</button>
-                            <span>1</span>
-                            <button class="quantity-btn">+</button>
-                        </div>
-                    </div>
-                </div>
+                <% }) %>
             </div>
         </div>
 
-        <!-- Footer with Order Controls -->
-        <footer class="order-footer">
-            <button class="cancel-button">Cancel</button>
-            <button class="pay-button" onclick="toggleCart()">Review & Pay</button>
-            <span class="order-total">Total: $185.90</span>
-        </footer>
+        <!-- Cart Section (Initially Hidden) -->
+        <div class="cart-section" id="cart-section">
+            <h2>Your Cart</h2>
+            <div class="cart-item">
+                <img src="https://via.placeholder.com/50" alt="Chocolate Croffle">
+                <div class="cart-details">
+                    <p class="cart-product-name">Chocolate Croffle</p>
+                    <p class="cart-product-price">120.00</p>
+                    <div class="quantity-control">
+                        <button class="quantity-btn">-</button>
+                        <span>2</span>
+                        <button class="quantity-btn">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="cart-item">
+                <img src="https://via.placeholder.com/50" alt="Spanish Latte">
+                <div class="cart-details">
+                    <p class="cart-product-name">Spanish Latte</p>
+                    <p class="cart-product-price">49.00</p>
+                    <div class="quantity-control">
+                        <button class="quantity-btn">-</button>
+                        <span>1</span>
+                        <button class="quantity-btn">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="cart-summary">
+                <div>
+                    <span>Subtotal</span>
+                    <span>169.00</span>
+                </div>
+                <div>
+                    <span>Tax</span>
+                    <span>16.9</span>
+                </div>
+                <div class="total">
+                    <span>Total</span>
+                    <span>185.9</span>
+                </div>
+            </div>
+            <button class="pay-button">Pay Now</button>
+        </div>
     </div>
 
     <script>
         function toggleCart() {
             const cartSection = document.getElementById("cart-section");
+            const mainContent = document.getElementById("main-content");
             cartSection.classList.toggle("visible");
+            mainContent.classList.toggle("shifted");
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const categoryButtons = document.querySelectorAll('.categories button');
+    const productItems = document.querySelectorAll('.product-item');
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const selectedCategory = button.getAttribute('data-category');
+
+            productItems.forEach(item => {
+                const productCategory = item.getAttribute('data-category-id');
+
+                if (selectedCategory === 'all' || productCategory === selectedCategory) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+
     </script>
 </body>
 </html>

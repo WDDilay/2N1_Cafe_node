@@ -28,6 +28,7 @@ const upload = multer({ storage: storage });
 //user routes
 router.get('/', ucontroller.main);
 router.post('/login', ucontroller.login);
+router.get('/account', ucontroller.account);
 
 
 //product routes
@@ -50,6 +51,7 @@ router.post('/edit-product/:product_id', upload.single('product_image'), pcontro
 //main routes
 
 router.get('/kiosk', mcontroller.kiosk);
+router.get('/kiosk/products/:category_id', mcontroller.filterProductsByCategory);
 
 
 module.exports = router;
