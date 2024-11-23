@@ -30,62 +30,6 @@
                         <h3><%= p.name %></h3>
                     </div>
                     <% }) %>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Fried Bangus">
-                        <h3>Fried Bangus</h3>
-                        <p>₱ 139.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Parmesan Chicken">
-                        <h3>Parmesan Chicken</h3>
-                        <p>₱ 129.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Overload">
-                        <h3>Overload</h3>
-                        <p>₱ 149.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Spaghetti">
-                        <h3>Spaghetti</h3>
-                        <p>₱ 125.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Buttered Squid">
-                        <h3>Buttered Squid</h3>
-                        <p>₱ 129.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Shrimp Pasta">
-                        <h3>Shrimp Pasta</h3>
-                        <p>₱ 125.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Buffalo Shrimp">
-                        <h3>Buffalo Shrimp</h3>
-                        <p>₱ 139.00</p>
-                    </div>
-                    <!-- Additional menu items to demonstrate scrolling -->
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Grilled Salmon">
-                        <h3>Grilled Salmon</h3>
-                        <p>₱ 189.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Beef Steak">
-                        <h3>Beef Steak</h3>
-                        <p>₱ 199.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Vegetable Stir Fry">
-                        <h3>Vegetable Stir Fry</h3>
-                        <p>₱ 109.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Chicken Alfredo">
-                        <h3>Chicken Alfredo</h3>
-                        <p>₱ 135.00</p>
-                    </div>
                 </div>
             </div>
             <div id="product-modal" class="modal hidden">
@@ -153,14 +97,14 @@
                             menuGrid.innerHTML += menuItem;
                         });
 
-                        // Re-bind click events to new menu items
+                        
+                        
                         attachMenuItemEvents();
                     })
                     .catch(error => console.error('Error fetching products:', error));
             });
         });
 
-        // Function to attach modal events to menu items
         function attachMenuItemEvents() {
             const menuItems = document.querySelectorAll('.menu-item');
 
@@ -181,7 +125,6 @@
             });
         }
 
-        // Adjust quantity
         increaseQtyBtn.addEventListener('click', () => {
             currentQuantity++;
             quantityDisplay.textContent = currentQuantity;
@@ -194,19 +137,17 @@
             }
         });
 
-        // Add to order (example functionality)
         addToOrderBtn.addEventListener('click', () => {
             console.log(`Added to order: ${modalTitle.textContent}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
             modal.classList.add('hidden');
         });
 
-        // Close modal
         cancelModalBtn.addEventListener('click', () => {
             modal.classList.add('hidden');
         });
 
-        // Initial binding for the default category (loaded on page load)
-        attachMenuItemEvents(); // <--- This binds events to menu items on the initial render
+        
+        attachMenuItemEvents();
     });
 </script>
 
