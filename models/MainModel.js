@@ -5,40 +5,42 @@ const m = {
     getProductsByCategory: (category_id, callback) => {
         const query = `
             SELECT 
-                products.product_id, 
-                products.name AS name, 
-                products.description, 
-                products.product_image, 
-                categories.type AS type, 
-                categories.category_name AS category_name
-            FROM products
-            JOIN categories ON products.category_id = categories.category_id
-            WHERE products.category_id = ?
+                p.product_id, 
+                p.name, 
+                p.description, 
+                p.product_image, 
+                c.type AS category_type, 
+                c.category_name,
+                ps.name AS size_name,
+                ps.price AS size_price
+            FROM products p
+            JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN product_sizes ps ON p.product_id = ps.product_id
+            WHERE p.category_id = ?
         `;
         db.query(query, [category_id], (err, results) => {
-            if (err) {
-                console.error("Query error:", err); 
-                return callback(err);
-            }
+            if (err) return callback(err);
             callback(null, results);
         });
     },
-
-    // Fetch all products
+    
     getAllProducts: (callback) => {
         const query = `
             SELECT 
-                products.product_id, 
-                products.name, 
-                products.description, 
-                products.product_image, 
-                categories.type AS type, 
-                categories.category_name
-            FROM products
-            JOIN categories ON products.category_id = categories.category_id
+                p.product_id, 
+                p.name, 
+                p.description, 
+                p.product_image, 
+                c.type AS category_type, 
+                c.category_name,
+                ps.name AS size_name,
+                ps.price AS size_price
+            FROM products p
+            JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN product_sizes ps ON p.product_id = ps.product_id
         `;
         db.query(query, callback);
     }
-}
+}    
 
 module.exports = m;
