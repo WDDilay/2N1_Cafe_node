@@ -2,8 +2,8 @@ const db = require('../config/db.js');
 
 const c = {
     add: (data, callback) => {
-        const query = "INSERT INTO categories (category_name) VALUES (?)";
-        db.query(query,  [data.name], callback);
+        const query = "INSERT INTO categories (category_name, type) VALUES (?, ?)";
+        db.query(query, [data.name, data.type], callback);
     },
 
     delete: (category_id, callback) => {

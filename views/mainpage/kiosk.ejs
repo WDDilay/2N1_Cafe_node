@@ -1,85 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2n1 Self-Ordering Kiosk</title>
-  <link rel="stylesheet" href="maincss/kiosk.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Menu</title>
+    <link rel="stylesheet" href="maincss/kiosk.css">
 </head>
 <body>
-  <header class="header">
-    <h1>2n1</h1>
-  </header>
-  <div class="main-container">
-    <!-- Categories Sidebar -->
-    <aside class="categories">
-      <h2>Categories</h2>
-      <ul id="category-list">
-        <li onclick="filterDishes('all')">
-          <img src="milktea.png" alt="Logo" class="category-logo"> All
-        </li>        
-        <% category.forEach(c => { %>
-        <li onclick="filterDishes(<%= c.category_id %>)">
-          <img src="milktea.png" alt="<%= c.category_name %> Logo" class="category-logo"> <%= c.category_name %>
-        </li>
-        <% }) %>
-      </ul>
-    </aside>
-
-    <!-- Dishes Section -->
-    <section class="dishes" id="dish-list">
-      
-      <% product.forEach(p => { %>
-      <div class="dish-item" onclick="addToOrder({ name: 'Spring Rolls', price: 5.99 })">
-        <img src="/uploads/<%= p.product_image %>" alt="Spring Rolls" class="dish-image">
-        <div class="dish-info">
-          <strong><%= p.name %></strong>
-        </div>
-      </div>
-      <% }) %>
-    </section>
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-left">
-      <h3>Total: <span id="total-price">$0.00</span></h3>
-    </div>
-    <div class="footer-center">
-      <ul id="order-list" class="scrollable"></ul>
-    </div>
-    <div class="footer-right">
-      <button id="review-order" onclick="reviewOrder()">Review Order</button>
-    </div>
-  </footer>
-
-  <script>
-    async function filterDishes(category_id) {
-    try {
-        const response = await fetch(`/kiosk/products/${category_id}`);
-        const products = await response.json();
-
-        const dishList = document.getElementById('dish-list');
-        dishList.innerHTML = ''; // Clear the existing product list
-
-        products.forEach(product => {
-            const dishItem = document.createElement('div');
-            dishItem.className = 'dish-item';
-            dishItem.onclick = () => addToOrder({ name: product.name, price: product.price });
-
-            dishItem.innerHTML = `
-                <img src="/uploads/${product.product_image}" alt="${product.name}" class="dish-image">
-                <div class="dish-info">
-                    <strong>${product.name}</strong>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="logo" role="img" aria-label="Restaurant logo"></div>
+            <button class="category-btn" data-category-id="all">All</button>
+            <% category.forEach(ca => { %>
+            <button class="category-btn" data-category-id="<%= ca.category_id %>"><%= ca.category_name %></button>
+            <% }) %>
+        </nav>
+        <main class="main-content">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search for items..." aria-label="Search for menu items">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+            </div>
+            <div class="menu-grid-container">
+                <div class="menu-grid">
+                    <% product.forEach(p => { %>
+                    <div class="menu-item"data-name="<%= p.name %>" 
+                        data-price="<%= p.price %>" 
+                        data-image="/uploads/<%= p.product_image %>">
+                        <img src="/uploads/<%= p.product_image %>" alt="Carbonara">
+                        <h3><%= p.name %></h3>
+                    </div>
+                    <% }) %>
                 </div>
-            `;
-            dishList.appendChild(dishItem);
-        });
-    } catch (error) {
-        console.error('Error fetching products by category:', error);
-    }
-}
-
-  </script>
+            </div>
+            <div id="product-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2 id="modal-title">Product Name</h2>
+                    <img id="modal-image" src="" alt="Product Image">
+                    
+                    <!-- Size Selection -->
+                    <div class="size-control">
+                        <button class="size-btn" data-size="Small">Small</button>
+                        <button class="size-btn" data-size="Medium">Medium</button>
+                        <button class="size-btn" data-size="Large">Large</button>
+                    </div>
+                    
+                    <div class="quantity-control">
+                        <button id="decrease-qty" class="qty-btn">-</button>
+                        <span id="quantity">1</span>
+                        <button id="increase-qty" class="qty-btn">+</button>
+                    </div>
+                    
+                    <p id="modal-price">₱ 0.00</p>
+                    <button id="add-to-order" class="modal-btn">Add to Order</button>
+                    <button id="cancel-modal" class="modal-btn cancel-btn">Cancel</button>
+                </div>
+            </div>            
+            <footer class="footer">
+                <div class="total-cost">Total: ₱ 0.00</div>
+                <div class="order-summary">
+                    <!-- Order summary will be populated dynamically -->
+                </div>
+                <button class="review-order-btn">Review Order</button>
+            </footer>
+        </main>
+    </div>
 </body>
+<script>
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const menuGrid = document.querySelector('.menu-grid');
+        const modal = document.getElementById('product-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalImage = document.getElementById('modal-image');
+        const modalPrice = document.getElementById('modal-price');
+        const quantityDisplay = document.getElementById('quantity');
+        const addToOrderBtn = document.getElementById('add-to-order');
+        const cancelModalBtn = document.getElementById('cancel-modal');
+        const decreaseQtyBtn = document.getElementById('decrease-qty');
+        const increaseQtyBtn = document.getElementById('increase-qty');
+
+        let currentQuantity = 1;
+
+        // Attach click event to category buttons
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const categoryId = button.getAttribute('data-category-id');
+
+                fetch(`/kiosk/products/${categoryId}`)
+                    .then(response => response.json())
+                    .then(products => {
+                        // Clear the menu grid
+                        menuGrid.innerHTML = '';
+
+                        // Populate the menu grid with the new products
+                        products.forEach(product => {
+                            const menuItem = `
+                                <div class="menu-item" 
+                                    data-name="${product.name}" 
+                                    data-price="${product.price}" 
+                                    data-image="/uploads/${product.product_image}">
+                                    <img src="/uploads/${product.product_image}" alt="${product.name}">
+                                    <h3>${product.name}</h3>
+                                </div>
+                            `;
+                            menuGrid.innerHTML += menuItem;
+                        });
+
+                        
+                        
+                        attachMenuItemEvents();
+                    })
+                    .catch(error => console.error('Error fetching products:', error));
+            });
+        });
+
+        function attachMenuItemEvents() {
+            const menuItems = document.querySelectorAll('.menu-item');
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const name = item.getAttribute('data-name');
+                    const price = item.getAttribute('data-price');
+                    const image = item.getAttribute('data-image');
+
+                    modalTitle.textContent = name;
+                    modalImage.src = image;
+                    modalPrice.textContent = `₱ ${price}`;
+                    currentQuantity = 1;
+                    quantityDisplay.textContent = currentQuantity;
+
+                    modal.classList.remove('hidden');
+                });
+            });
+        }
+
+        increaseQtyBtn.addEventListener('click', () => {
+            currentQuantity++;
+            quantityDisplay.textContent = currentQuantity;
+        });
+
+        decreaseQtyBtn.addEventListener('click', () => {
+            if (currentQuantity > 1) {
+                currentQuantity--;
+                quantityDisplay.textContent = currentQuantity;
+            }
+        });
+
+        addToOrderBtn.addEventListener('click', () => {
+            console.log(`Added to order: ${modalTitle.textContent}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
+            modal.classList.add('hidden');
+        });
+
+        cancelModalBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        
+        attachMenuItemEvents();
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+    const sizeButtons = document.querySelectorAll('.size-btn');
+    let selectedSize = 'Medium'; // Default size
+
+    sizeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all size buttons
+            sizeButtons.forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to the clicked button
+            button.classList.add('active');
+
+            // Update the selected size
+            selectedSize = button.getAttribute('data-size');
+        });
+    });
+
+    addToOrderBtn.addEventListener('click', () => {
+        console.log(`Added to order: ${modalTitle.textContent}, Size: ${selectedSize}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
+        modal.classList.add('hidden');
+    });
+
+    // Initialize default size button as active
+    document.querySelector(`[data-size="${selectedSize}"]`).classList.add('active');
+});
+
+</script>
 </html>
