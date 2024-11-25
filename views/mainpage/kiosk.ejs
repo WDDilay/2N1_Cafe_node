@@ -36,16 +36,25 @@
                 <div class="modal-content">
                     <h2 id="modal-title">Product Name</h2>
                     <img id="modal-image" src="" alt="Product Image">
+                    
+                    <!-- Size Selection -->
+                    <div class="size-control">
+                        <button class="size-btn" data-size="Small">Small</button>
+                        <button class="size-btn" data-size="Medium">Medium</button>
+                        <button class="size-btn" data-size="Large">Large</button>
+                    </div>
+                    
                     <div class="quantity-control">
                         <button id="decrease-qty" class="qty-btn">-</button>
                         <span id="quantity">1</span>
                         <button id="increase-qty" class="qty-btn">+</button>
                     </div>
+                    
                     <p id="modal-price">₱ 0.00</p>
                     <button id="add-to-order" class="modal-btn">Add to Order</button>
                     <button id="cancel-modal" class="modal-btn cancel-btn">Cancel</button>
                 </div>
-            </div>
+            </div>            
             <footer class="footer">
                 <div class="total-cost">Total: ₱ 0.00</div>
                 <div class="order-summary">
@@ -57,6 +66,7 @@
     </div>
 </body>
 <script>
+    
     document.addEventListener('DOMContentLoaded', () => {
         const categoryButtons = document.querySelectorAll('.category-btn');
         const menuGrid = document.querySelector('.menu-grid');
@@ -149,9 +159,31 @@
         
         attachMenuItemEvents();
     });
+    document.addEventListener('DOMContentLoaded', () => {
+    const sizeButtons = document.querySelectorAll('.size-btn');
+    let selectedSize = 'Medium'; // Default size
+
+    sizeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all size buttons
+            sizeButtons.forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to the clicked button
+            button.classList.add('active');
+
+            // Update the selected size
+            selectedSize = button.getAttribute('data-size');
+        });
+    });
+
+    addToOrderBtn.addEventListener('click', () => {
+        console.log(`Added to order: ${modalTitle.textContent}, Size: ${selectedSize}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
+        modal.classList.add('hidden');
+    });
+
+    // Initialize default size button as active
+    document.querySelector(`[data-size="${selectedSize}"]`).classList.add('active');
+});
+
 </script>
-
-
-
-
 </html>
