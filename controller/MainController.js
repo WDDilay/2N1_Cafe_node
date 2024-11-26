@@ -26,8 +26,8 @@ const m = {
                     console.error('Error fetching all products:', err);
                     return res.status(500).json({ error: 'Failed to fetch products.' });
                 }
-                console.log("Fetched All Products: ", results); 
-                res.json(results); 
+                console.log("Fetched All Products: ", results);
+                res.json(results);
             });
         } else {
             main.getProductsByCategory(categoryId, (err, results) => {
@@ -35,12 +35,11 @@ const m = {
                     console.error('Error fetching products by category:', err);
                     return res.status(500).json({ error: 'Failed to fetch products.' });
                 }
+                console.log("Fetched Products by Category: ", results);
                 res.json(results);
             });
         }
     }
-    
-    
     
 };
 

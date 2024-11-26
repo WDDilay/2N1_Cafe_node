@@ -27,9 +27,10 @@ const p = {
     },
 
     addProducts: (req, res) => {
-        const { name, description} = req.body;
-        const category_id = req.body.category_id;
-        
+        const { name, description, price, category_id } = req.body;
+    
+        console.log('Form Data:', req.body);
+    
         if (!req.file) {
             return res.status(400).send('No file uploaded.');
         }
@@ -41,19 +42,25 @@ const p = {
         const newProduct = {
             name,
             description,
-            product_image: req.file.filename,  // File name from multer
-            category_id: parseInt(category_id)  // Ensure category_id is an integer
-
+            product_image: req.file.filename,
+            category_id: parseInt(category_id, 10),
         };
+    
+        if (price) {
+            newProduct.price = parseFloat(price);
+        }
+    
+        console.log('Prepared Product Data:', newProduct);
     
         product.addProduct(newProduct, (err, result) => {
             if (err) {
-                console.error("Error adding product:", err);
-                return res.status(500).send("Error adding product.");
+                console.error('Error adding product:', err);
+                return res.status(500).send(err.message || 'Error adding product.');
             }
-            res.redirect('/product'); // Redirect after successful insertion
+            res.redirect('/product');
         });
     },
+    
 
     deleteProduct: (req, res) => {
         const productId = req.params.product_id;

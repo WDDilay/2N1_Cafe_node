@@ -66,9 +66,7 @@
     </div>
 </body>
 <script>
-    
     document.addEventListener('DOMContentLoaded', () => {
-        const categoryButtons = document.querySelectorAll('.category-btn');
         const menuGrid = document.querySelector('.menu-grid');
         const modal = document.getElementById('product-modal');
         const modalTitle = document.getElementById('modal-title');
@@ -79,62 +77,95 @@
         const cancelModalBtn = document.getElementById('cancel-modal');
         const decreaseQtyBtn = document.getElementById('decrease-qty');
         const increaseQtyBtn = document.getElementById('increase-qty');
+        const sizeButtonsContainer = document.querySelector('.size-control');
 
         let currentQuantity = 1;
+        let selectedSize = 'Medium'; // Default size
 
-        // Attach click event to category buttons
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const categoryId = button.getAttribute('data-category-id');
+        // Fetch all products initially
+        function fetchAllProducts() {
+            fetch('/kiosk/products/all') // Assuming this endpoint returns all products
+                .then(response => response.json())
+                .then(products => {
+                    populateMenuGrid(products);
+                })
+                .catch(error => console.error('Error fetching products:', error));
+        }
 
-                fetch(`/kiosk/products/${categoryId}`)
-                    .then(response => response.json())
-                    .then(products => {
-                        // Clear the menu grid
-                        menuGrid.innerHTML = '';
+        // Populate the menu grid with products
+        function populateMenuGrid(products) {
+            const seenProducts = new Set();
+            menuGrid.innerHTML = ''; // Clear the menu grid
 
-                        // Populate the menu grid with the new products
-                        products.forEach(product => {
-                            const menuItem = `
-                                <div class="menu-item" 
-                                    data-name="${product.name}" 
-                                    data-price="${product.price}" 
-                                    data-image="/uploads/${product.product_image}">
-                                    <img src="/uploads/${product.product_image}" alt="${product.name}">
-                                    <h3>${product.name}</h3>
-                                </div>
-                            `;
-                            menuGrid.innerHTML += menuItem;
-                        });
+            products.forEach(product => {
+                if (!seenProducts.has(product.product_id)) {
+                    seenProducts.add(product.product_id);
 
-                        
-                        
-                        attachMenuItemEvents();
-                    })
-                    .catch(error => console.error('Error fetching products:', error));
+                    const menuItem = `
+                        <div class="menu-item" 
+                            data-name="${product.name}" 
+                            data-category="${product.category_type}" 
+                            data-image="/uploads/${product.product_image}" 
+                            data-price="${product.price || product.size_price || ''}"
+                            data-sizes='${JSON.stringify(product.sizes || [])}'
+                            data-id="${product.product_id}">
+                            <img src="/uploads/${product.product_image}" alt="${product.name}">
+                            <h3>${product.name}</h3>
+                        </div>
+                    `;
+                    menuGrid.innerHTML += menuItem;
+                }
             });
-        });
 
+            attachMenuItemEvents();
+        }
+
+        // Attach click events to menu items
         function attachMenuItemEvents() {
             const menuItems = document.querySelectorAll('.menu-item');
 
             menuItems.forEach(item => {
                 item.addEventListener('click', () => {
                     const name = item.getAttribute('data-name');
-                    const price = item.getAttribute('data-price');
+                    const category = item.getAttribute('data-category');
                     const image = item.getAttribute('data-image');
+                    const sizes = JSON.parse(item.getAttribute('data-sizes') || '[]');
+                    const price = item.getAttribute('data-price');
 
+                    // Populate modal with product details
                     modalTitle.textContent = name;
                     modalImage.src = image;
-                    modalPrice.textContent = `₱ ${price}`;
                     currentQuantity = 1;
                     quantityDisplay.textContent = currentQuantity;
+
+                    if (category === 'food') {
+                        // Hide size buttons and display price
+                        sizeButtonsContainer.style.display = 'none';
+                        modalPrice.textContent = `₱ ${price}`;
+                    } else if (category === 'beverage') {
+                        // Show size buttons for beverages
+                        sizeButtonsContainer.style.display = 'flex';
+                        sizeButtonsContainer.innerHTML = ''; // Clear existing buttons
+
+                        sizes.forEach(size => {
+                            const sizeButton = document.createElement('button');
+                            sizeButton.classList.add('size-btn');
+                            sizeButton.textContent = size.name;
+                            sizeButton.setAttribute('data-price', size.price);
+                            sizeButton.addEventListener('click', () => {
+                                modalPrice.textContent = `₱ ${size.price}`;
+                                selectedSize = size.name;
+                            });
+                            sizeButtonsContainer.appendChild(sizeButton);
+                        });
+                    }
 
                     modal.classList.remove('hidden');
                 });
             });
         }
 
+        // Quantity increase and decrease
         increaseQtyBtn.addEventListener('click', () => {
             currentQuantity++;
             quantityDisplay.textContent = currentQuantity;
@@ -147,43 +178,20 @@
             }
         });
 
+        // Add to Order functionality
         addToOrderBtn.addEventListener('click', () => {
-            console.log(`Added to order: ${modalTitle.textContent}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
+            console.log(`Added to order: ${modalTitle.textContent}, Size: ${selectedSize || 'N/A'}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
             modal.classList.add('hidden');
         });
 
+        // Cancel modal
         cancelModalBtn.addEventListener('click', () => {
             modal.classList.add('hidden');
         });
 
-        
-        attachMenuItemEvents();
+        // Initial fetch of all products
+        fetchAllProducts();
     });
-    document.addEventListener('DOMContentLoaded', () => {
-    const sizeButtons = document.querySelectorAll('.size-btn');
-    let selectedSize = 'Medium'; // Default size
-
-    sizeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all size buttons
-            sizeButtons.forEach(btn => btn.classList.remove('active'));
-
-            // Add active class to the clicked button
-            button.classList.add('active');
-
-            // Update the selected size
-            selectedSize = button.getAttribute('data-size');
-        });
-    });
-
-    addToOrderBtn.addEventListener('click', () => {
-        console.log(`Added to order: ${modalTitle.textContent}, Size: ${selectedSize}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
-        modal.classList.add('hidden');
-    });
-
-    // Initialize default size button as active
-    document.querySelector(`[data-size="${selectedSize}"]`).classList.add('active');
-});
-
 </script>
+
 </html>
