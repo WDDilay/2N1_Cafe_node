@@ -68,12 +68,29 @@ const p = {
 
     getProduct: (callback) => {
         const query = `
-            SELECT products.product_id, products.name AS name, products.description, products.product_image, categories.category_name AS category_name
+            SELECT 
+                products.product_id, 
+                products.name AS name, 
+                products.description, 
+                products.product_image, 
+                categories.category_name AS category_name,
+                categories.type AS category_type,
+                CASE 
+                    WHEN categories.type = 'food' THEN (
+                        SELECT price 
+                        FROM product_sizes 
+                        WHERE product_sizes.product_id = products.product_id 
+                        AND product_sizes.name = 'Default' 
+                        LIMIT 1
+                    )
+                    ELSE NULL
+                END AS price
             FROM products
             JOIN categories ON products.category_id = categories.category_id
         `;
         db.query(query, callback);
     },
+    
 
     deleteProduct: (product_id, callback) => {
         // First, get the product image filename
