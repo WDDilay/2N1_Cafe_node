@@ -67,166 +67,173 @@
 </body>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-    const menuGrid = document.querySelector('.menu-grid');
-    const categoryButtons = document.querySelectorAll('.category-btn');
-    const modal = document.getElementById('product-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalImage = document.getElementById('modal-image');
-    const modalPrice = document.getElementById('modal-price');
-    const quantityDisplay = document.getElementById('quantity');
-    const addToOrderBtn = document.getElementById('add-to-order');
-    const cancelModalBtn = document.getElementById('cancel-modal');
-    const decreaseQtyBtn = document.getElementById('decrease-qty');
-    const increaseQtyBtn = document.getElementById('increase-qty');
-    const sizeButtonsContainer = document.querySelector('.size-control');
+        const menuGrid = document.querySelector('.menu-grid');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const modal = document.getElementById('product-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalImage = document.getElementById('modal-image');
+        const modalPrice = document.getElementById('modal-price');
+        const quantityDisplay = document.getElementById('quantity');
+        const addToOrderBtn = document.getElementById('add-to-order');
+        const cancelModalBtn = document.getElementById('cancel-modal');
+        const decreaseQtyBtn = document.getElementById('decrease-qty');
+        const increaseQtyBtn = document.getElementById('increase-qty');
+        const sizeButtonsContainer = document.querySelector('.size-control');
 
-    let currentQuantity = 1;
-    let selectedSize = 'Medium'; // Default size
+        let currentQuantity = 1;
+        let selectedSize = 'Medium'; // Default size
+        let basePrice = 0; // Base price for the selected item
 
-    // Attach click event to category buttons
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const categoryId = button.getAttribute('data-category-id');
+        // Function to update modal price based on quantity
+        function updateModalPrice() {
+            const totalPrice = (basePrice * currentQuantity).toFixed(2);
+            modalPrice.textContent = `₱ ${totalPrice}`;
+        }
 
-            fetch(categoryId === 'all' ? '/kiosk/products/all' : `/kiosk/products/${categoryId}`)
-    .then(response => response.json())
-    .then(products => {
-        // Clear the menu grid before populating
-        menuGrid.innerHTML = '';
+        // Attach click event to category buttons
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const categoryId = button.getAttribute('data-category-id');
 
-        // Populate the menu grid with fetched products
-        products.forEach(product => {
-            // Determine price for food type products
-            let price = product.category_type === 'food'
-                ? product.sizes && product.sizes.length > 0
-                    ? product.sizes[0].price // Use the price of the first size
-                    : '0.00' // Default price if sizes array is empty
-                : product.price || '0.00';
+                fetch(categoryId === 'all' ? '/kiosk/products/all' : `/kiosk/products/${categoryId}`)
+                    .then(response => response.json())
+                    .then(products => {
+                        // Clear the menu grid before populating
+                        menuGrid.innerHTML = '';
 
-            const menuItem = `
-                <div class="menu-item" 
-                    data-name="${product.name}" 
-                    data-category="${product.category_type}" 
-                    data-price="${price}" 
-                    data-image="/uploads/${product.product_image}" 
-                    data-sizes='${JSON.stringify(product.sizes || [])}' 
-                    data-id="${product.product_id}">
-                    <img src="/uploads/${product.product_image}" alt="${product.name}">
-                    <h3>${product.name}</h3>
-                </div>
-            `;
-            menuGrid.innerHTML += menuItem;
-        });
+                        // Populate the menu grid with fetched products
+                        products.forEach(product => {
+                            let price = product.category_type === 'food'
+                                ? product.sizes && product.sizes.length > 0
+                                    ? product.sizes[0].price // Use the price of the first size
+                                    : '0.00' // Default price if sizes array is empty
+                                : product.price || '0.00';
 
-        // Attach click events to newly created menu items
-        attachMenuItemEvents();
-    })
-    .catch(error => console.error('Error fetching products:', error));
-        });
-    });
-
-    // Function to attach events to menu items
-    function attachMenuItemEvents() {
-        const menuItems = document.querySelectorAll('.menu-item');
-
-        menuItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const name = item.getAttribute('data-name');
-                const category = item.getAttribute('data-category'); // Get category
-                const image = item.getAttribute('data-image');
-                const sizes = JSON.parse(item.getAttribute('data-sizes') || '[]');
-                const price = item.getAttribute('data-price');
-
-                // Populate modal with product details
-                modalTitle.textContent = name;
-                modalImage.src = image;
-                currentQuantity = 1;
-                quantityDisplay.textContent = currentQuantity;
-
-                // Determine category behavior
-                if (category === 'food') {
-                    // Hide size buttons and display price
-                    sizeButtonsContainer.style.display = 'none';
-                    modalPrice.textContent = `₱ ${price}`;
-                } else if (category === 'beverage') {
-                    // Show size buttons for beverages
-                    sizeButtonsContainer.style.display = 'flex';
-                    sizeButtonsContainer.innerHTML = ''; // Clear existing buttons
-
-                    sizes.forEach(size => {
-                        const sizeButton = document.createElement('button');
-                        sizeButton.classList.add('size-btn');
-                        sizeButton.textContent = size.name;
-                        sizeButton.setAttribute('data-price', size.price);
-                        sizeButton.addEventListener('click', () => {
-                            modalPrice.textContent = `₱ ${size.price}`;
-                            selectedSize = size.name;
+                            const menuItem = `
+                                <div class="menu-item" 
+                                    data-name="${product.name}" 
+                                    data-category="${product.category_type}" 
+                                    data-price="${price}" 
+                                    data-image="/uploads/${product.product_image}" 
+                                    data-sizes='${JSON.stringify(product.sizes || [])}' 
+                                    data-id="${product.product_id}">
+                                    <img src="/uploads/${product.product_image}" alt="${product.name}">
+                                    <h3>${product.name}</h3>
+                                </div>
+                            `;
+                            menuGrid.innerHTML += menuItem;
                         });
-                        sizeButtonsContainer.appendChild(sizeButton);
-                    });
-                }
 
-                modal.classList.remove('hidden');
+                        // Attach click events to newly created menu items
+                        attachMenuItemEvents();
+                    })
+                    .catch(error => console.error('Error fetching products:', error));
             });
         });
-    }
 
-    // Quantity increase and decrease
-    increaseQtyBtn.addEventListener('click', () => {
-        currentQuantity++;
-        quantityDisplay.textContent = currentQuantity;
-    });
+        // Function to attach events to menu items
+        function attachMenuItemEvents() {
+            const menuItems = document.querySelectorAll('.menu-item');
 
-    decreaseQtyBtn.addEventListener('click', () => {
-        if (currentQuantity > 1) {
-            currentQuantity--;
-            quantityDisplay.textContent = currentQuantity;
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const name = item.getAttribute('data-name');
+                    const category = item.getAttribute('data-category');
+                    const image = item.getAttribute('data-image');
+                    const sizes = JSON.parse(item.getAttribute('data-sizes') || '[]');
+                    const price = parseFloat(item.getAttribute('data-price') || '0.00');
+
+                    // Populate modal with product details
+                    modalTitle.textContent = name;
+                    modalImage.src = image;
+                    currentQuantity = 1;
+                    quantityDisplay.textContent = currentQuantity;
+
+                    basePrice = price; // Set base price
+                    updateModalPrice(); // Set initial price
+
+                    // Determine category behavior
+                    if (category === 'food') {
+                        sizeButtonsContainer.style.display = 'none';
+                        modalPrice.textContent = `₱ ${price.toFixed(2)}`;
+                    } else if (category === 'beverage') {
+                        sizeButtonsContainer.style.display = 'flex';
+                        sizeButtonsContainer.innerHTML = '';
+
+                        sizes.forEach(size => {
+                            const sizeButton = document.createElement('button');
+                            sizeButton.classList.add('size-btn');
+                            sizeButton.textContent = size.name;
+                            sizeButton.setAttribute('data-price', size.price);
+                            sizeButton.addEventListener('click', () => {
+                                basePrice = parseFloat(size.price); // Update base price on size selection
+                                updateModalPrice(); // Update price
+                                selectedSize = size.name;
+                            });
+                            sizeButtonsContainer.appendChild(sizeButton);
+                        });
+                    }
+
+                    modal.classList.remove('hidden');
+                });
+            });
         }
-    });
 
-    // Add to Order functionality
-    addToOrderBtn.addEventListener('click', () => {
-        console.log(`Added to order: ${modalTitle.textContent}, Size: ${selectedSize || 'N/A'}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
-        modal.classList.add('hidden');
-    });
-
-    // Cancel modal
-    cancelModalBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
-
-    // Fetch all products initially
-    // Fetch all products initially
-fetch('/kiosk/products/all')
-    .then(response => response.json())
-    .then(products => {
-        // Clear the menu grid before populating
-        menuGrid.innerHTML = '';
-
-        // Populate the menu grid with fetched products
-        products.forEach(product => {
-            const menuItem = `
-                <div class="menu-item" 
-                    data-name="${product.name}" 
-                    data-category="${product.category_type}" 
-                    data-price="${product.price || product.size_price || ''}" 
-                    data-image="/uploads/${product.product_image}" 
-                    data-sizes='${JSON.stringify(product.sizes || [])}' 
-                    data-id="${product.product_id}">
-                    <img src="/uploads/${product.product_image}" alt="${product.name}">
-                    <h3>${product.name}</h3>
-                </div>
-            `;
-            menuGrid.innerHTML += menuItem;
+        // Quantity increase
+        increaseQtyBtn.addEventListener('click', () => {
+            currentQuantity++;
+            quantityDisplay.textContent = currentQuantity;
+            updateModalPrice(); // Update price
         });
 
-        // Attach click events to newly created menu items
-        attachMenuItemEvents();
-    })
-    .catch(error => console.error('Error fetching all products:', error));
+        // Quantity decrease
+        decreaseQtyBtn.addEventListener('click', () => {
+            if (currentQuantity > 1) {
+                currentQuantity--;
+                quantityDisplay.textContent = currentQuantity;
+                updateModalPrice(); // Update price
+            }
+        });
 
-});
+        // Add to Order functionality
+        addToOrderBtn.addEventListener('click', () => {
+            console.log(`Added to order: ${modalTitle.textContent}, Size: ${selectedSize || 'N/A'}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
+            modal.classList.add('hidden');
+        });
 
+        // Cancel modal
+        cancelModalBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // Fetch all products initially
+        fetch('/kiosk/products/all')
+            .then(response => response.json())
+            .then(products => {
+                // Clear the menu grid before populating
+                menuGrid.innerHTML = '';
+
+                // Populate the menu grid with fetched products
+                products.forEach(product => {
+                    const menuItem = `
+                        <div class="menu-item" 
+                            data-name="${product.name}" 
+                            data-category="${product.category_type}" 
+                            data-price="${product.price || product.size_price || ''}" 
+                            data-image="/uploads/${product.product_image}" 
+                            data-sizes='${JSON.stringify(product.sizes || [])}' 
+                            data-id="${product.product_id}">
+                            <img src="/uploads/${product.product_image}" alt="${product.name}">
+                            <h3>${product.name}</h3>
+                        </div>
+                    `;
+                    menuGrid.innerHTML += menuItem;
+                });
+
+                // Attach click events to newly created menu items
+                attachMenuItemEvents();
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    });
 </script>
-
 </html>
