@@ -3,6 +3,17 @@ const app = express();
 const bodyParser = require('body-parser');
 const routes = require('./routes/router.js')
 const path = require('path');
+const session = require('express-session');
+app.use(express.json());
+app.use(
+    session({
+        secret: 'your-secret-key',
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: false }, // Set `secure: true` if using HTTPS
+    })
+);
+
 
 
 app.set('view engine', 'ejs');
