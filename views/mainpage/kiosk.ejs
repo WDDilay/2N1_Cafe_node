@@ -55,8 +55,17 @@
                     <button id="cancel-modal" class="modal-btn cancel-btn">Cancel</button>
                 </div>
             </div>            
+            <div id="order-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2>Your Order</h2>
+                    <div class="order-summary"></div>
+                    <button class="modal-btn" id="close-order-modal">Close</button>
+                    <button class="modal-btn cancel-btn">Cancel Order</button>
+                    <button class="modal-btn">Proceed to Payment</button>
+                </div>
+            </div>            
             <footer class="footer">
-                <div class="total-cost">Total Items: No items in cart</div>
+                <div class="total-cost"><strong>Total Items:</strong> No items in cart</div>
                 <div class="order-summary">
                     <!-- Order summary will be populated dynamically -->
                 </div>
@@ -66,6 +75,68 @@
     </div>
 </body>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const reviewOrderBtn = document.querySelector('.review-order-btn');
+    const orderModal = document.getElementById('order-modal');
+    const closeOrderModalBtn = document.getElementById('close-order-modal');
+    const cancelOrderBtn = document.querySelector('.cancel-btn');
+
+    // Show the order modal
+    reviewOrderBtn.addEventListener('click', () => {
+        orderModal.classList.remove('hidden');
+    });
+
+    // Close the modal
+    closeOrderModalBtn.addEventListener('click', () => {
+        orderModal.classList.add('hidden');
+    });
+
+    // Cancel Order
+    cancelOrderBtn.addEventListener('click', () => {
+        fetch('/cart/clear', { method: 'POST' })
+            .then(() => {
+                updateOrderSummary([]);
+                orderModal.classList.add('hidden');
+            })
+            .catch(error => console.error('Error clearing cart:', error));
+    });
+
+    // Update the order summary to be shown inside the modal
+    function updateOrderSummary(cartItems) {
+        const orderSummary = document.querySelector('.order-summary');
+        const totalCostDiv = document.querySelector('.total-cost');
+        orderSummary.innerHTML = '';
+        let totalItems = 0;
+        let totalCost = 0;
+
+        cartItems.forEach(item => {
+            totalItems += item.quantity;
+            totalCost += item.price * item.quantity;
+            const orderItem = `
+                <div class="order-summary-item">
+                    ${item.quantity}x ${item.name} (${item.size}) - ₱ ${item.price.toFixed(2)}
+                    <button class="delete-btn" data-id="${item.product_id}">Delete</button>
+                </div>`;
+            orderSummary.innerHTML += orderItem;
+        });
+
+        totalCostDiv.innerHTML = `<strong>Total:</strong> ₱${totalCost.toFixed(2)} (${totalItems} items)`;
+
+        // Attach delete button logic
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                deleteCartItem(button.dataset.id);
+            });
+        });
+    }
+
+    function deleteCartItem(productId) {
+        fetch(`/cart/remove/${productId}`, { method: 'POST' })
+            .then(() => fetchCartItems())
+            .catch(error => console.error('Error deleting item:', error));
+    }
+});
+
    document.addEventListener('DOMContentLoaded', () => {
     const menuGrid = document.querySelector('.menu-grid');
     const categoryButtons = document.querySelectorAll('.category-btn');

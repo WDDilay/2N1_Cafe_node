@@ -153,11 +153,12 @@ body, html {
 
 .modal-content {
   background: white;
-  border-radius: 10px;
   padding: 20px;
-  text-align: center;
+  border-radius: 10px;
   width: 90%;
-  max-width: 400px;
+  max-width: 600px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
 }
 
 .modal-content img {
@@ -260,15 +261,9 @@ body, html {
 
 /* Individual item container */
 .order-summary-item {
-  display: flex; /* Align details and button horizontally */
-  justify-content: space-between; /* Space out content */
-  align-items: center; /* Align content vertically */
-  padding: 12px; /* Add spacing inside the item */
-  margin-bottom: 12px; /* Add spacing between items */
-  border: 1px solid #ddd; /* Light border around the item */
-  border-radius: 6px; /* Slightly rounded corners */
-  background-color: #ffffff; /* White background for the item */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 /* Item details styling */
