@@ -16,10 +16,10 @@
             <% }) %>
         </nav>
         <main class="main-content">
-            <div class="search-container">
+           <!-- <div class="search-container">
                 <input type="text" class="search-input" placeholder="Search for items..." aria-label="Search for menu items">
                 <span class="search-icon" aria-hidden="true">🔍</span>
-            </div>
+            </div> -->
             <div class="menu-grid-container">
                 <div class="menu-grid">
                     <% product.forEach(p => { %>
@@ -30,80 +30,33 @@
                         <h3><%= p.name %></h3>
                     </div>
                     <% }) %>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Fried Bangus">
-                        <h3>Fried Bangus</h3>
-                        <p>₱ 139.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Parmesan Chicken">
-                        <h3>Parmesan Chicken</h3>
-                        <p>₱ 129.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Overload">
-                        <h3>Overload</h3>
-                        <p>₱ 149.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Spaghetti">
-                        <h3>Spaghetti</h3>
-                        <p>₱ 125.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Buttered Squid">
-                        <h3>Buttered Squid</h3>
-                        <p>₱ 129.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Shrimp Pasta">
-                        <h3>Shrimp Pasta</h3>
-                        <p>₱ 125.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Buffalo Shrimp">
-                        <h3>Buffalo Shrimp</h3>
-                        <p>₱ 139.00</p>
-                    </div>
-                    <!-- Additional menu items to demonstrate scrolling -->
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Grilled Salmon">
-                        <h3>Grilled Salmon</h3>
-                        <p>₱ 189.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Beef Steak">
-                        <h3>Beef Steak</h3>
-                        <p>₱ 199.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Vegetable Stir Fry">
-                        <h3>Vegetable Stir Fry</h3>
-                        <p>₱ 109.00</p>
-                    </div>
-                    <div class="menu-item">
-                        <img src="/placeholder.svg?height=150&width=200" alt="Chicken Alfredo">
-                        <h3>Chicken Alfredo</h3>
-                        <p>₱ 135.00</p>
-                    </div>
                 </div>
             </div>
             <div id="product-modal" class="modal hidden">
                 <div class="modal-content">
                     <h2 id="modal-title">Product Name</h2>
                     <img id="modal-image" src="" alt="Product Image">
+                    
+                    <!-- Size Selection -->
+                    <div class="size-control">
+                        <button class="size-btn" data-size="Small">Small</button>
+                        <button class="size-btn" data-size="Medium">Medium</button>
+                        <button class="size-btn" data-size="Large">Large</button>
+                    </div>
+                    
                     <div class="quantity-control">
                         <button id="decrease-qty" class="qty-btn">-</button>
                         <span id="quantity">1</span>
                         <button id="increase-qty" class="qty-btn">+</button>
                     </div>
+                    
                     <p id="modal-price">₱ 0.00</p>
                     <button id="add-to-order" class="modal-btn">Add to Order</button>
                     <button id="cancel-modal" class="modal-btn cancel-btn">Cancel</button>
                 </div>
-            </div>
+            </div>            
             <footer class="footer">
-                <div class="total-cost">Total: ₱ 0.00</div>
+                <div class="total-cost">Total Items: No items in cart</div>
                 <div class="order-summary">
                     <!-- Order summary will be populated dynamically -->
                 </div>
@@ -113,104 +66,278 @@
     </div>
 </body>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        const menuGrid = document.querySelector('.menu-grid');
-        const modal = document.getElementById('product-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalImage = document.getElementById('modal-image');
-        const modalPrice = document.getElementById('modal-price');
-        const quantityDisplay = document.getElementById('quantity');
-        const addToOrderBtn = document.getElementById('add-to-order');
-        const cancelModalBtn = document.getElementById('cancel-modal');
-        const decreaseQtyBtn = document.getElementById('decrease-qty');
-        const increaseQtyBtn = document.getElementById('increase-qty');
+   document.addEventListener('DOMContentLoaded', () => {
+    const menuGrid = document.querySelector('.menu-grid');
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const modal = document.getElementById('product-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalImage = document.getElementById('modal-image');
+    const modalPrice = document.getElementById('modal-price');
+    const quantityDisplay = document.getElementById('quantity');
+    const addToOrderBtn = document.getElementById('add-to-order');
+    const cancelModalBtn = document.getElementById('cancel-modal');
+    const decreaseQtyBtn = document.getElementById('decrease-qty');
+    const increaseQtyBtn = document.getElementById('increase-qty');
+    const sizeButtonsContainer = document.querySelector('.size-control');
 
-        let currentQuantity = 1;
+    let currentQuantity = 1;
+    let selectedSize = 'Medium'; // Default size
+    let basePrice = 0; // Base price for the selected item
 
-        // Attach click event to category buttons
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const categoryId = button.getAttribute('data-category-id');
+    // Function to update modal price based on quantity
+    function updateModalPrice() {
+        const totalPrice = (basePrice * currentQuantity).toFixed(2);
+        modalPrice.textContent = `₱ ${totalPrice}`;
+    }
 
-                fetch(`/kiosk/products/${categoryId}`)
-                    .then(response => response.json())
-                    .then(products => {
-                        // Clear the menu grid
-                        menuGrid.innerHTML = '';
+    // Attach click event to category buttons
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const categoryId = button.getAttribute('data-category-id');
 
-                        // Populate the menu grid with the new products
-                        products.forEach(product => {
-                            const menuItem = `
-                                <div class="menu-item" 
-                                    data-name="${product.name}" 
-                                    data-price="${product.price}" 
-                                    data-image="/uploads/${product.product_image}">
-                                    <img src="/uploads/${product.product_image}" alt="${product.name}">
-                                    <h3>${product.name}</h3>
-                                </div>
-                            `;
-                            menuGrid.innerHTML += menuItem;
-                        });
+            fetch(categoryId === 'all' ? '/kiosk/products/all' : `/kiosk/products/${categoryId}`)
+                .then(response => response.json())
+                .then(products => {
+                    // Clear the menu grid before populating
+                    menuGrid.innerHTML = '';
 
-                        // Re-bind click events to new menu items
-                        attachMenuItemEvents();
-                    })
-                    .catch(error => console.error('Error fetching products:', error));
-            });
+                    // Populate the menu grid with fetched products
+                    products.forEach(product => {
+                        let price = product.category_type === 'food'
+                            ? product.sizes && product.sizes.length > 0
+                                ? product.sizes[0].price // Use the price of the first size
+                                : '0.00' // Default price if sizes array is empty
+                            : product.price || '0.00';
+
+                        const menuItem = `
+                            <div class="menu-item" 
+                                data-name="${product.name}" 
+                                data-category="${product.category_type}" 
+                                data-price="${price}" 
+                                data-image="/uploads/${product.product_image}" 
+                                data-sizes='${JSON.stringify(product.sizes || [])}' 
+                                data-id="${product.product_id}">
+                                <img src="/uploads/${product.product_image}" alt="${product.name}">
+                                <h3>${product.name}</h3>
+                            </div>
+                        `;
+                        menuGrid.innerHTML += menuItem;
+                    });
+
+                    // Attach click events to newly created menu items
+                    attachMenuItemEvents();
+                })
+                .catch(error => console.error('Error fetching products:', error));
         });
-
-        // Function to attach modal events to menu items
-        function attachMenuItemEvents() {
-            const menuItems = document.querySelectorAll('.menu-item');
-
-            menuItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const name = item.getAttribute('data-name');
-                    const price = item.getAttribute('data-price');
-                    const image = item.getAttribute('data-image');
-
-                    modalTitle.textContent = name;
-                    modalImage.src = image;
-                    modalPrice.textContent = `₱ ${price}`;
-                    currentQuantity = 1;
-                    quantityDisplay.textContent = currentQuantity;
-
-                    modal.classList.remove('hidden');
-                });
-            });
-        }
-
-        // Adjust quantity
-        increaseQtyBtn.addEventListener('click', () => {
-            currentQuantity++;
-            quantityDisplay.textContent = currentQuantity;
-        });
-
-        decreaseQtyBtn.addEventListener('click', () => {
-            if (currentQuantity > 1) {
-                currentQuantity--;
-                quantityDisplay.textContent = currentQuantity;
-            }
-        });
-
-        // Add to order (example functionality)
-        addToOrderBtn.addEventListener('click', () => {
-            console.log(`Added to order: ${modalTitle.textContent}, Quantity: ${currentQuantity}, Price: ${modalPrice.textContent}`);
-            modal.classList.add('hidden');
-        });
-
-        // Close modal
-        cancelModalBtn.addEventListener('click', () => {
-            modal.classList.add('hidden');
-        });
-
-        // Initial binding for the default category (loaded on page load)
-        attachMenuItemEvents(); // <--- This binds events to menu items on the initial render
     });
+
+    // Function to attach events to menu items
+    function attachMenuItemEvents() {
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const name = item.getAttribute('data-name');
+                const category = item.getAttribute('data-category');
+                const image = item.getAttribute('data-image');
+                const sizes = JSON.parse(item.getAttribute('data-sizes') || '[]');
+                const price = parseFloat(item.getAttribute('data-price') || '0.00');
+                const productId = item.getAttribute('data-id'); // Get the product ID
+
+                // Populate modal with product details
+                modalTitle.textContent = name;
+                modalImage.src = image;
+                currentQuantity = 1;
+                quantityDisplay.textContent = currentQuantity;
+
+                basePrice = price; // Set base price
+                updateModalPrice(); // Set initial price
+
+                // Set the product ID in the modal
+                modal.setAttribute('data-id', productId); // Add product ID to the modal
+
+                // Determine category behavior
+                if (category === 'food') {
+                    sizeButtonsContainer.style.display = 'none';
+                    selectedSize = sizes.length > 0 ? sizes[0].name : 'Default';
+                    modalPrice.textContent = `₱ ${price.toFixed(2)}`;
+                } else if (category === 'beverage') {
+                    sizeButtonsContainer.style.display = 'flex';
+                    sizeButtonsContainer.innerHTML = '';
+
+                    sizes.forEach(size => {
+                        const sizeButton = document.createElement('button');
+                        sizeButton.classList.add('size-btn');
+                        sizeButton.textContent = size.name;
+                        sizeButton.setAttribute('data-price', size.price);
+                        sizeButton.addEventListener('click', () => {
+                            basePrice = parseFloat(size.price); // Update base price on size selection
+                            updateModalPrice(); // Update price
+                            selectedSize = size.name;
+                        });
+                        sizeButtonsContainer.appendChild(sizeButton);
+                    });
+                }
+
+                modal.classList.remove('hidden');
+            });
+        });
+    }
+
+    // Quantity increase
+    increaseQtyBtn.addEventListener('click', () => {
+        currentQuantity++;
+        quantityDisplay.textContent = currentQuantity;
+        updateModalPrice(); // Update price
+    });
+
+    // Quantity decrease
+    decreaseQtyBtn.addEventListener('click', () => {
+        if (currentQuantity > 1) {
+            currentQuantity--;
+            quantityDisplay.textContent = currentQuantity;
+            updateModalPrice(); // Update price
+        }
+    });
+
+    // Add to Order functionality
+    addToOrderBtn.addEventListener('click', () => {
+        const productId = modal.getAttribute('data-id');
+        const size = selectedSize;
+        const quantity = currentQuantity;
+        const price = basePrice * quantity;
+
+        // Send data to the backend
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: parseInt(productId),
+                size: size,
+                quantity: parseInt(quantity),
+                price: parseFloat(price),
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Fetch the updated cart items after adding the new product
+            fetchCartItems();  // Fetch cart items to update order summary
+        })
+        .catch(error => console.error('Error adding to cart:', error));
+
+        modal.classList.add('hidden'); // Hide modal
+    });
+
+    // Fetch cart items and update the order summary
+    function fetchCartItems() {
+        fetch('/cart/items') // Make sure this endpoint returns all cart items
+            .then(response => response.json())
+            .then(cartItems => {
+                updateOrderSummary(cartItems); // Update the order summary dynamically
+            })
+            .catch(error => console.error('Error fetching cart items:', error));
+    }
+
+    // Function to update the order summary
+    function updateOrderSummary(cartItems) {
+    const orderSummary = document.querySelector('.order-summary');
+    const totalCostDiv = document.querySelector('.total-cost');
+    orderSummary.innerHTML = ''; // Clear existing items
+
+    let totalItems = 0; // Initialize a counter for total items
+
+    // Create a wrapper div for all items
+    const orderSummaryList = document.createElement('div');
+    orderSummaryList.classList.add('order-summary-list');
+
+    // Loop through cart items and create a summary item for each one
+    cartItems.forEach(item => {
+        totalItems += item.quantity; // Add the quantity of each item to the total count
+
+        const price = parseFloat(item.price) || 0; // Default to 0 if invalid
+
+        // Create a container for each cart item
+        const itemContainer = document.createElement('div');
+        itemContainer.classList.add('order-summary-item');
+        
+        // Create item details as a separate div
+        const itemDetailsDiv = document.createElement('div');
+        itemDetailsDiv.classList.add('order-item-details');
+        itemDetailsDiv.innerHTML = `
+            ${item.quantity}x ${item.name} (${item.size}) - ₱ ${price.toFixed(2)}
+        `;
+
+        // Create the delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('delete-btn');
+        deleteButton.dataset.id = item.product_id; // Add product ID as a data attribute
+        deleteButton.textContent = 'Delete';
+
+        // Add event listener for delete button
+        deleteButton.addEventListener('click', () => {
+            deleteCartItem(item.product_id); // Call delete function when clicked
+        });
+
+        // Append item details and delete button to the item container
+        itemContainer.appendChild(itemDetailsDiv);
+        itemContainer.appendChild(deleteButton);
+
+        // Append the item container to the order summary list
+        orderSummaryList.appendChild(itemContainer);
+    });
+
+    // Append the orderSummaryList to the main orderSummary div
+    orderSummary.appendChild(orderSummaryList);
+
+    // Update total cost display with the total number of items
+    if (totalCostDiv) {
+        totalCostDiv.innerHTML = `<strong>Total Items:</strong> ${totalItems} items in cart`;
+    } else {
+        const newTotalCostDiv = document.createElement('div');
+        newTotalCostDiv.classList.add('total-cost');
+        newTotalCostDiv.innerHTML = `<strong>Total Items:</strong> ${totalItems} items in cart`;
+        document.querySelector('.footer').appendChild(newTotalCostDiv);
+    }
+}
+
+    fetchCartItems(); 
+
+    // Cancel modal
+    cancelModalBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    // Fetch all products initially
+    fetch('/kiosk/products/all')
+        .then(response => response.json())
+        .then(products => {
+            // Clear the menu grid before populating
+            menuGrid.innerHTML = '';
+
+            // Populate the menu grid with fetched products
+            products.forEach(product => {
+                const menuItem = `
+                    <div class="menu-item" 
+                        data-name="${product.name}" 
+                        data-category="${product.category_type}" 
+                        data-price="${product.price || product.size_price || ''}" 
+                        data-image="/uploads/${product.product_image}" 
+                        data-sizes='${JSON.stringify(product.sizes || [])}' 
+                        data-id="${product.product_id}">
+                        <img src="/uploads/${product.product_image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                    </div>
+                `;
+                menuGrid.innerHTML += menuItem;
+            });
+
+            // Attach click events to newly created menu items
+            attachMenuItemEvents();
+        })
+        .catch(error => console.error('Error fetching products:', error));
+});
+
 </script>
-
-
-
-
 </html>

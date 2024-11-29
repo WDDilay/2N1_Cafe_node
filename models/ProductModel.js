@@ -9,18 +9,88 @@ const p = {
     },
 
     addProduct: (data, callback) => {
-        const query = "INSERT INTO products (name, description, product_image, category_id) VALUES (?, ?, ?, ?)";
-        db.query(query,  [data.name, data.description, data.product_image, data.category_id], callback);
+        console.log('Model: Incoming Data:', data);
+    
+        const getCategoryTypeQuery = "SELECT type FROM categories WHERE category_id = ?";
+        db.query(getCategoryTypeQuery, [data.category_id], (err, result) => {
+            if (err) {
+                return callback(err);
+            }
+    
+            const categoryType = result[0]?.type;
+    
+            const insertProductQuery = "INSERT INTO products (name, description, product_image, category_id) VALUES (?, ?, ?, ?)";
+            db.query(insertProductQuery, [data.name, data.description, data.product_image, data.category_id], (err, result) => {
+                if (err) {
+                    return callback(err);
+                }
+    
+                const product_id = result.insertId;
+    
+                if (categoryType === 'food') {
+                    if (!data.price || isNaN(data.price)) {
+                        return callback(new Error(`Invalid price: ${data.price}. Price is required for food products.`));
+                    }
+    
+                    const insertFoodPriceQuery = "INSERT INTO product_sizes (product_id, name, price) VALUES (?, 'Default', ?)";
+                    db.query(insertFoodPriceQuery, [product_id, data.price], (err) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        callback(null, result);
+                    });
+                } else if (categoryType === 'beverage') {
+                    const beveragePrices = [
+                        { size: 'Small', price: 29.00 },
+                        { size: 'Medium', price: 39.00 },
+                        { size: 'Large', price: 49.00 }
+                    ];
+    
+                    const insertBeveragePriceQuery = "INSERT INTO product_sizes (product_id, name, price) VALUES (?, ?, ?)";
+                    const tasks = beveragePrices.map(size => {
+                        return new Promise((resolve, reject) => {
+                            db.query(insertBeveragePriceQuery, [product_id, size.size, size.price], (err) => {
+                                if (err) return reject(err);
+                                resolve();
+                            });
+                        });
+                    });
+    
+                    Promise.all(tasks)
+                        .then(() => callback(null, result))
+                        .catch(callback);
+                } else {
+                    callback(null, result);
+                }
+            });
+        });
     },
 
     getProduct: (callback) => {
         const query = `
-            SELECT products.product_id, products.name AS name, products.description, products.product_image, categories.category_name AS category_name
+            SELECT 
+                products.product_id, 
+                products.name AS name, 
+                products.description, 
+                products.product_image, 
+                categories.category_name AS category_name,
+                categories.type AS category_type,
+                CASE 
+                    WHEN categories.type = 'food' THEN (
+                        SELECT price 
+                        FROM product_sizes 
+                        WHERE product_sizes.product_id = products.product_id 
+                        AND product_sizes.name = 'Default' 
+                        LIMIT 1
+                    )
+                    ELSE NULL
+                END AS price
             FROM products
             JOIN categories ON products.category_id = categories.category_id
         `;
         db.query(query, callback);
     },
+    
 
     deleteProduct: (product_id, callback) => {
         // First, get the product image filename

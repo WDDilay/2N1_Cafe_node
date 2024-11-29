@@ -4,8 +4,8 @@ const path = require('path');
 const ucontroller = require('../controller/UserController.js');
 const pcontroller = require('../controller/ProductController.js');
 const ccontroller = require('../controller/Category.js');
-const mcontroller = require('../controller/MainController.js')
-const scontroller = require('../controller/Staffcontroller.js')
+const mcontroller = require('../controller/MainController.js');
+const cartController = require('../controller/CartController.js');
 
 const multer = require('multer');
 
@@ -54,10 +54,10 @@ router.post('/edit-product/:product_id', upload.single('product_image'), pcontro
 router.get('/kiosk', mcontroller.kiosk);
 router.get('/kiosk/products/:category_id', mcontroller.filterProductsByCategory);
 
+//cart routes
+router.post('/cart/add', cartController.addToCart);
+router.get('/cart/items', cartController.getCartItems);
+router.delete('/cart/items/:cartItemId', cartController.deleteCartItem);
 
-
-// Route to get sales report data
-router.get('/dashboard', scontroller.getSalesReport);
-router.get('/dashboard', scontroller.getDashboard);
 
 module.exports = router;
