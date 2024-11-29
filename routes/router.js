@@ -57,6 +57,7 @@ router.get('/kiosk/products/:category_id', mcontroller.filterProductsByCategory)
 //cart routes
 router.post('/cart/add', cartController.addToCart);
 router.get('/cart/items', cartController.getCartItems);
+router.delete('/cart/items/:cartItemId', cartController.deleteCartItem);
 
 
 module.exports = router;

@@ -32,7 +32,21 @@ const cartModel = {
             }
             callback(null, results); // Return the cart items
         });
-    }
+    },
+
+    deleteCartItem: (cartItemId, callback) => {
+        const query = `DELETE FROM cart_items WHERE cart_item_id = ?`;
+    
+        db.query(query, [cartItemId], (err, result) => {
+            if (err) {
+                console.error('Database error:', err);
+                return callback(err);
+            }
+    
+            callback(null, result); // Return the result of the deletion
+        });
+    },
+    
 };
 
 module.exports = cartModel;

@@ -61,6 +61,24 @@ const cartController = {
             res.status(200).json(cartItems); // Return cart items
         });
     },
+
+    deleteCartItem: (req, res) => {
+        const { cartItemId } = req.params;
+    
+        // Validate input
+        if (!cartItemId || isNaN(parseInt(cartItemId))) {
+            return res.status(400).json({ error: 'Invalid cart item ID.' });
+        }
+    
+        cartModel.deleteCartItem(parseInt(cartItemId), (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to delete cart item.' });
+            }
+    
+            res.status(200).json({ message: 'Cart item deleted successfully.', data: result });
+        });
+    },
+    
 };
 
 module.exports = cartController;

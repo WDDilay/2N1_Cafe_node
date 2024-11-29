@@ -226,33 +226,86 @@ body, html {
   color: #fff;
 }
 
-.order-summary-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+/* Main order summary container */
+.order-summary {
+  max-width: 800px;
+  margin: 0 auto; /* Center align the order summary */
+  padding: 12px;
+}
+/* Custom scrollbar for Webkit browsers */
+.order-summary::-webkit-scrollbar {
+  width: 5px; /* Set scrollbar width */
 }
 
-.order-summary-table th, .order-summary-table td {
-  padding: 10px;
-  text-align: left;
-  border: 1px solid #ddd;
+.order-summary::-webkit-scrollbar-thumb {
+  background-color: #ccc; /* Light gray thumb */
+  border-radius: 5px; /* Rounded scrollbar thumb */
 }
 
-.order-summary-table th {
-  background-color: #f4f4f4;
-  font-weight: bold;
+.order-summary::-webkit-scrollbar-track {
+  background-color: #f9f9f9; /* Light background for the track */
 }
 
-.order-summary-table td {
-  text-align: center;
+/* Custom scrollbar for Firefox */
+.order-summary {
+  scrollbar-width: thin; /* Thin scrollbar */
+  scrollbar-color: #ccc #f9f9f9; /* Thumb and track colors */
 }
 
+
+/* Wrapper for all items */
+.order-summary-list {
+  margin-top: 5px;
+}
+
+/* Individual item container */
+.order-summary-item {
+  display: flex; /* Align details and button horizontally */
+  justify-content: space-between; /* Space out content */
+  align-items: center; /* Align content vertically */
+  padding: 12px; /* Add spacing inside the item */
+  margin-bottom: 12px; /* Add spacing between items */
+  border: 1px solid #ddd; /* Light border around the item */
+  border-radius: 6px; /* Slightly rounded corners */
+  background-color: #ffffff; /* White background for the item */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+/* Item details styling */
+.order-item-details {
+  font-size: 16px;
+  color: #333; /* Dark gray for readability */
+  line-height: 1.5; /* Increase line spacing */
+}
+
+/* Delete button styling */
+.delete-btn {
+  padding: 6px 12px;
+  background-color: #ff4d4d; /* Red background for delete */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover effect for delete button */
+.delete-btn:hover {
+  background-color: #e60000; /* Darker red on hover */
+}
+
+/* Total cost section */
 .total-cost {
-  margin-top: 15px;
-  font-size: 1.2rem;
+  margin-top: 16px;
+  padding: 12px;
+  font-size: 18px;
   font-weight: bold;
-  text-align: left; /* Align to the left */
+  text-align: center;
+  color: #333;
+  background-color: #fafafa;
 }
+
 
 
 

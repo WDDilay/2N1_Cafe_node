@@ -56,7 +56,7 @@
                 </div>
             </div>            
             <footer class="footer">
-                <div class="total-cost">Total: ₱ 0.00</div>
+                <div class="total-cost">Total Items: No items in cart</div>
                 <div class="order-summary">
                     <!-- Order summary will be populated dynamically -->
                 </div>
@@ -66,259 +66,278 @@
     </div>
 </body>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const menuGrid = document.querySelector('.menu-grid');
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        const modal = document.getElementById('product-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalImage = document.getElementById('modal-image');
-        const modalPrice = document.getElementById('modal-price');
-        const quantityDisplay = document.getElementById('quantity');
-        const addToOrderBtn = document.getElementById('add-to-order');
-        const cancelModalBtn = document.getElementById('cancel-modal');
-        const decreaseQtyBtn = document.getElementById('decrease-qty');
-        const increaseQtyBtn = document.getElementById('increase-qty');
-        const sizeButtonsContainer = document.querySelector('.size-control');
+   document.addEventListener('DOMContentLoaded', () => {
+    const menuGrid = document.querySelector('.menu-grid');
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const modal = document.getElementById('product-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalImage = document.getElementById('modal-image');
+    const modalPrice = document.getElementById('modal-price');
+    const quantityDisplay = document.getElementById('quantity');
+    const addToOrderBtn = document.getElementById('add-to-order');
+    const cancelModalBtn = document.getElementById('cancel-modal');
+    const decreaseQtyBtn = document.getElementById('decrease-qty');
+    const increaseQtyBtn = document.getElementById('increase-qty');
+    const sizeButtonsContainer = document.querySelector('.size-control');
 
-        let currentQuantity = 1;
-        let selectedSize = 'Medium'; // Default size
-        let basePrice = 0; // Base price for the selected item
+    let currentQuantity = 1;
+    let selectedSize = 'Medium'; // Default size
+    let basePrice = 0; // Base price for the selected item
 
-        // Function to update modal price based on quantity
-        function updateModalPrice() {
-            const totalPrice = (basePrice * currentQuantity).toFixed(2);
-            modalPrice.textContent = `₱ ${totalPrice}`;
-        }
+    // Function to update modal price based on quantity
+    function updateModalPrice() {
+        const totalPrice = (basePrice * currentQuantity).toFixed(2);
+        modalPrice.textContent = `₱ ${totalPrice}`;
+    }
 
-        // Attach click event to category buttons
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const categoryId = button.getAttribute('data-category-id');
+    // Attach click event to category buttons
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const categoryId = button.getAttribute('data-category-id');
 
-                fetch(categoryId === 'all' ? '/kiosk/products/all' : `/kiosk/products/${categoryId}`)
-                    .then(response => response.json())
-                    .then(products => {
-                        // Clear the menu grid before populating
-                        menuGrid.innerHTML = '';
+            fetch(categoryId === 'all' ? '/kiosk/products/all' : `/kiosk/products/${categoryId}`)
+                .then(response => response.json())
+                .then(products => {
+                    // Clear the menu grid before populating
+                    menuGrid.innerHTML = '';
 
-                        // Populate the menu grid with fetched products
-                        products.forEach(product => {
-                            let price = product.category_type === 'food'
-                                ? product.sizes && product.sizes.length > 0
-                                    ? product.sizes[0].price // Use the price of the first size
-                                    : '0.00' // Default price if sizes array is empty
-                                : product.price || '0.00';
+                    // Populate the menu grid with fetched products
+                    products.forEach(product => {
+                        let price = product.category_type === 'food'
+                            ? product.sizes && product.sizes.length > 0
+                                ? product.sizes[0].price // Use the price of the first size
+                                : '0.00' // Default price if sizes array is empty
+                            : product.price || '0.00';
 
-                            const menuItem = `
-                                <div class="menu-item" 
-                                    data-name="${product.name}" 
-                                    data-category="${product.category_type}" 
-                                    data-price="${price}" 
-                                    data-image="/uploads/${product.product_image}" 
-                                    data-sizes='${JSON.stringify(product.sizes || [])}' 
-                                    data-id="${product.product_id}">
-                                    <img src="/uploads/${product.product_image}" alt="${product.name}">
-                                    <h3>${product.name}</h3>
-                                </div>
-                            `;
-                            menuGrid.innerHTML += menuItem;
-                        });
+                        const menuItem = `
+                            <div class="menu-item" 
+                                data-name="${product.name}" 
+                                data-category="${product.category_type}" 
+                                data-price="${price}" 
+                                data-image="/uploads/${product.product_image}" 
+                                data-sizes='${JSON.stringify(product.sizes || [])}' 
+                                data-id="${product.product_id}">
+                                <img src="/uploads/${product.product_image}" alt="${product.name}">
+                                <h3>${product.name}</h3>
+                            </div>
+                        `;
+                        menuGrid.innerHTML += menuItem;
+                    });
 
-                        // Attach click events to newly created menu items
-                        attachMenuItemEvents();
-                    })
-                    .catch(error => console.error('Error fetching products:', error));
-            });
+                    // Attach click events to newly created menu items
+                    attachMenuItemEvents();
+                })
+                .catch(error => console.error('Error fetching products:', error));
         });
+    });
 
-        // Function to attach events to menu items
-        function attachMenuItemEvents() {
-            const menuItems = document.querySelectorAll('.menu-item');
+    // Function to attach events to menu items
+    function attachMenuItemEvents() {
+        const menuItems = document.querySelectorAll('.menu-item');
 
-            menuItems.forEach(item => {
-                item.addEventListener('click', () => {
-    const name = item.getAttribute('data-name');
-    const category = item.getAttribute('data-category');
-    const image = item.getAttribute('data-image');
-    const sizes = JSON.parse(item.getAttribute('data-sizes') || '[]');
-    const price = parseFloat(item.getAttribute('data-price') || '0.00');
-    const productId = item.getAttribute('data-id'); // Get the product ID
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const name = item.getAttribute('data-name');
+                const category = item.getAttribute('data-category');
+                const image = item.getAttribute('data-image');
+                const sizes = JSON.parse(item.getAttribute('data-sizes') || '[]');
+                const price = parseFloat(item.getAttribute('data-price') || '0.00');
+                const productId = item.getAttribute('data-id'); // Get the product ID
 
-    // Populate modal with product details
-    modalTitle.textContent = name;
-    modalImage.src = image;
-    currentQuantity = 1;
-    quantityDisplay.textContent = currentQuantity;
+                // Populate modal with product details
+                modalTitle.textContent = name;
+                modalImage.src = image;
+                currentQuantity = 1;
+                quantityDisplay.textContent = currentQuantity;
 
-    basePrice = price; // Set base price
-    updateModalPrice(); // Set initial price
+                basePrice = price; // Set base price
+                updateModalPrice(); // Set initial price
 
-    // Set the product ID in the modal
-    modal.setAttribute('data-id', productId); // Add product ID to the modal
+                // Set the product ID in the modal
+                modal.setAttribute('data-id', productId); // Add product ID to the modal
 
-    // Determine category behavior
-    if (category === 'food') {
-        sizeButtonsContainer.style.display = 'none';
-        selectedSize = sizes.length > 0 ? sizes[0].name : 'Default';
-        modalPrice.textContent = `₱ ${price.toFixed(2)}`;
-    } else if (category === 'beverage') {
-        sizeButtonsContainer.style.display = 'flex';
-        sizeButtonsContainer.innerHTML = '';
+                // Determine category behavior
+                if (category === 'food') {
+                    sizeButtonsContainer.style.display = 'none';
+                    selectedSize = sizes.length > 0 ? sizes[0].name : 'Default';
+                    modalPrice.textContent = `₱ ${price.toFixed(2)}`;
+                } else if (category === 'beverage') {
+                    sizeButtonsContainer.style.display = 'flex';
+                    sizeButtonsContainer.innerHTML = '';
 
-        sizes.forEach(size => {
-            const sizeButton = document.createElement('button');
-            sizeButton.classList.add('size-btn');
-            sizeButton.textContent = size.name;
-            sizeButton.setAttribute('data-price', size.price);
-            sizeButton.addEventListener('click', () => {
-                basePrice = parseFloat(size.price); // Update base price on size selection
-                updateModalPrice(); // Update price
-                selectedSize = size.name;
+                    sizes.forEach(size => {
+                        const sizeButton = document.createElement('button');
+                        sizeButton.classList.add('size-btn');
+                        sizeButton.textContent = size.name;
+                        sizeButton.setAttribute('data-price', size.price);
+                        sizeButton.addEventListener('click', () => {
+                            basePrice = parseFloat(size.price); // Update base price on size selection
+                            updateModalPrice(); // Update price
+                            selectedSize = size.name;
+                        });
+                        sizeButtonsContainer.appendChild(sizeButton);
+                    });
+                }
+
+                modal.classList.remove('hidden');
             });
-            sizeButtonsContainer.appendChild(sizeButton);
         });
     }
 
-    modal.classList.remove('hidden');
-});
-            });
-        }
+    // Quantity increase
+    increaseQtyBtn.addEventListener('click', () => {
+        currentQuantity++;
+        quantityDisplay.textContent = currentQuantity;
+        updateModalPrice(); // Update price
+    });
 
-        // Quantity increase
-        increaseQtyBtn.addEventListener('click', () => {
-            currentQuantity++;
+    // Quantity decrease
+    decreaseQtyBtn.addEventListener('click', () => {
+        if (currentQuantity > 1) {
+            currentQuantity--;
             quantityDisplay.textContent = currentQuantity;
             updateModalPrice(); // Update price
-        });
+        }
+    });
 
-        // Quantity decrease
-        decreaseQtyBtn.addEventListener('click', () => {
-            if (currentQuantity > 1) {
-                currentQuantity--;
-                quantityDisplay.textContent = currentQuantity;
-                updateModalPrice(); // Update price
-            }
-        });
+    // Add to Order functionality
+    addToOrderBtn.addEventListener('click', () => {
+        const productId = modal.getAttribute('data-id');
+        const size = selectedSize;
+        const quantity = currentQuantity;
+        const price = basePrice * quantity;
 
-        // Add to Order functionality
-        addToOrderBtn.addEventListener('click', () => {
-            const productId = modal.getAttribute('data-id');
-            // Ensure this attribute is set on the modal
-    const size = selectedSize;
-    const quantity = currentQuantity;
-    const price = basePrice * quantity;
+        // Send data to the backend
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: parseInt(productId),
+                size: size,
+                quantity: parseInt(quantity),
+                price: parseFloat(price),
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Fetch the updated cart items after adding the new product
+            fetchCartItems();  // Fetch cart items to update order summary
+        })
+        .catch(error => console.error('Error adding to cart:', error));
 
-    // Send data to the backend
-    fetch('/cart/add', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-        productId: parseInt(productId),
-        size: size,
-        quantity: parseInt(quantity),
-        price: parseFloat(price),
-    }),
-})
-    .then(response => response.json())
-    .then(data => {
+        modal.classList.add('hidden'); // Hide modal
+    });
+
+    // Fetch cart items and update the order summary
+    function fetchCartItems() {
         fetch('/cart/items') // Make sure this endpoint returns all cart items
             .then(response => response.json())
             .then(cartItems => {
                 updateOrderSummary(cartItems); // Update the order summary dynamically
             })
             .catch(error => console.error('Error fetching cart items:', error));
-    })
-.catch(error => console.error('Error adding to cart:', error));
+    }
 
-    modal.classList.add('hidden'); // Hide modal
-});
-
-function updateOrderSummary(cartItems) {
+    // Function to update the order summary
+    function updateOrderSummary(cartItems) {
     const orderSummary = document.querySelector('.order-summary');
     const totalCostDiv = document.querySelector('.total-cost');
     orderSummary.innerHTML = ''; // Clear existing items
 
-    let totalCost = 0;
+    let totalItems = 0; // Initialize a counter for total items
 
-    // Create the table structure
-    const table = document.createElement('table');
-    table.classList.add('order-summary-table');
+    // Create a wrapper div for all items
+    const orderSummaryList = document.createElement('div');
+    orderSummaryList.classList.add('order-summary-list');
 
-    // Add table header (removed 'Total' column)
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th>Product</th>
-        <th>Size</th>
-        <th>Quantity</th>
-        <th>Price</th>
-    `;
-    table.appendChild(headerRow);
-
-    // Populate table rows with cart items
+    // Loop through cart items and create a summary item for each one
     cartItems.forEach(item => {
-        const price = parseFloat(item.price) || 0;  // Default to 0 if invalid
-        totalCost += price;  // Sum the prices of all items
+        totalItems += item.quantity; // Add the quantity of each item to the total count
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.size}</td>
-            <td>${item.quantity}</td>
-            <td>₱ ${price.toFixed(2)}</td>
+        const price = parseFloat(item.price) || 0; // Default to 0 if invalid
+
+        // Create a container for each cart item
+        const itemContainer = document.createElement('div');
+        itemContainer.classList.add('order-summary-item');
+        
+        // Create item details as a separate div
+        const itemDetailsDiv = document.createElement('div');
+        itemDetailsDiv.classList.add('order-item-details');
+        itemDetailsDiv.innerHTML = `
+            ${item.quantity}x ${item.name} (${item.size}) - ₱ ${price.toFixed(2)}
         `;
-        table.appendChild(row);
+
+        // Create the delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('delete-btn');
+        deleteButton.dataset.id = item.product_id; // Add product ID as a data attribute
+        deleteButton.textContent = 'Delete';
+
+        // Add event listener for delete button
+        deleteButton.addEventListener('click', () => {
+            deleteCartItem(item.product_id); // Call delete function when clicked
+        });
+
+        // Append item details and delete button to the item container
+        itemContainer.appendChild(itemDetailsDiv);
+        itemContainer.appendChild(deleteButton);
+
+        // Append the item container to the order summary list
+        orderSummaryList.appendChild(itemContainer);
     });
 
-    // Append the table to the order summary container
-    orderSummary.appendChild(table);
+    // Append the orderSummaryList to the main orderSummary div
+    orderSummary.appendChild(orderSummaryList);
 
-    // Update total cost outside the table
+    // Update total cost display with the total number of items
     if (totalCostDiv) {
-        totalCostDiv.innerHTML = `<strong>Total Cost:</strong> ₱ ${totalCost.toFixed(2)}`;
+        totalCostDiv.innerHTML = `<strong>Total Items:</strong> ${totalItems} items in cart`;
     } else {
         const newTotalCostDiv = document.createElement('div');
         newTotalCostDiv.classList.add('total-cost');
-        newTotalCostDiv.innerHTML = `<strong>Total Cost:</strong> ₱ ${totalCost.toFixed(2)}`;
+        newTotalCostDiv.innerHTML = `<strong>Total Items:</strong> ${totalItems} items in cart`;
         document.querySelector('.footer').appendChild(newTotalCostDiv);
     }
 }
 
+    fetchCartItems(); 
 
-        // Cancel modal
-        cancelModalBtn.addEventListener('click', () => {
-            modal.classList.add('hidden');
-        });
-
-        // Fetch all products initially
-        fetch('/kiosk/products/all')
-            .then(response => response.json())
-            .then(products => {
-                // Clear the menu grid before populating
-                menuGrid.innerHTML = '';
-
-                // Populate the menu grid with fetched products
-                products.forEach(product => {
-                    const menuItem = `
-                        <div class="menu-item" 
-                            data-name="${product.name}" 
-                            data-category="${product.category_type}" 
-                            data-price="${product.price || product.size_price || ''}" 
-                            data-image="/uploads/${product.product_image}" 
-                            data-sizes='${JSON.stringify(product.sizes || [])}' 
-                            data-id="${product.product_id}">
-                            <img src="/uploads/${product.product_image}" alt="${product.name}">
-                            <h3>${product.name}</h3>
-                        </div>
-                    `;
-                    menuGrid.innerHTML += menuItem;
-                });
-
-                // Attach click events to newly created menu items
-                attachMenuItemEvents();
-            })
-            .catch(error => console.error('Error fetching products:', error));
+    // Cancel modal
+    cancelModalBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
     });
+
+    // Fetch all products initially
+    fetch('/kiosk/products/all')
+        .then(response => response.json())
+        .then(products => {
+            // Clear the menu grid before populating
+            menuGrid.innerHTML = '';
+
+            // Populate the menu grid with fetched products
+            products.forEach(product => {
+                const menuItem = `
+                    <div class="menu-item" 
+                        data-name="${product.name}" 
+                        data-category="${product.category_type}" 
+                        data-price="${product.price || product.size_price || ''}" 
+                        data-image="/uploads/${product.product_image}" 
+                        data-sizes='${JSON.stringify(product.sizes || [])}' 
+                        data-id="${product.product_id}">
+                        <img src="/uploads/${product.product_image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                    </div>
+                `;
+                menuGrid.innerHTML += menuItem;
+            });
+
+            // Attach click events to newly created menu items
+            attachMenuItemEvents();
+        })
+        .catch(error => console.error('Error fetching products:', error));
+});
+
 </script>
 </html>
