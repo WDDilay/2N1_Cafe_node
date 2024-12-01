@@ -54,6 +54,19 @@
                     <button id="add-to-order" class="modal-btn">Add to Order</button>
                     <button id="cancel-modal" class="modal-btn cancel-btn">Cancel</button>
                 </div>
+            </div>
+            <div id="review-order-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2>Order Summary</h2>
+                    <div class="order-items-container">
+                        <!-- Order items will be dynamically populated here -->
+                    </div>
+                    <div class="review-order-footer">
+                        <button id="back-to-menu" class="modal-btn">Back</button>
+                        <button id="cancel-order" class="modal-btn cancel-btn">Cancel Order</button>
+                        <button id="proceed-to-payment" class="modal-btn">Proceed to Payment</button>
+                    </div>
+                </div>
             </div>            
             <footer class="footer">
                 <div class="total-cost">Total Items: No items in cart</div>
@@ -79,6 +92,10 @@
     const decreaseQtyBtn = document.getElementById('decrease-qty');
     const increaseQtyBtn = document.getElementById('increase-qty');
     const sizeButtonsContainer = document.querySelector('.size-control');
+    const reviewOrderModal = document.getElementById('review-order-modal');
+    const reviewOrderBtn = document.querySelector('.review-order-btn');
+    const backToMenuBtn = document.getElementById('back-to-menu');
+    const cancelOrderBtn = document.getElementById('cancel-order');
 
     let currentQuantity = 1;
     let selectedSize = 'Medium'; // Default size
@@ -183,6 +200,29 @@
             });
         });
     }
+
+    
+    if (reviewOrderBtn) {
+        reviewOrderBtn.addEventListener('click', () => {
+            fetchCartItems(); // Update cart items before showing modal
+            reviewOrderModal.classList.remove('hidden');
+        });
+    }
+
+    // Close Review Order Modal (Back to Menu)
+    backToMenuBtn.addEventListener('click', () => {
+        reviewOrderModal.classList.add('hidden');
+    });
+
+    // Cancel Order
+    cancelOrderBtn.addEventListener('click', () => {
+        fetch('/cart/clear', { method: 'POST' }) // Clear all cart items via backend
+            .then(() => {
+                fetchCartItems(); // Update cart items after clearing
+                reviewOrderModal.classList.add('hidden');
+            })
+            .catch(error => console.error('Error clearing cart:', error));
+    });
 
     // Quantity increase
     increaseQtyBtn.addEventListener('click', () => {
