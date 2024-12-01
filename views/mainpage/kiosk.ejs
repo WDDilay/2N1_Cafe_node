@@ -216,42 +216,17 @@
 
                 totalCostDiv.innerHTML = `<strong>Total Items:</strong> ${totalItems} items, ₱${totalPrice.toFixed(2)}`;
 
-                // Attach delete button events after updating the order summary
-                attachDeleteButtonEvents();
-            }
-
-            // Attach delete button events
-            function attachDeleteEvents() {
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const productId = button.dataset.id;
-                        cart = cart.filter(item => item.id !== productId);
+                // Attach delete event to remove items from the cart
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        cart = cart.filter(item => item.id !== id);
                         updateOrderSummary();
                     });
                 });
             }
 
-            // Add item to cart
-            addToOrderBtn.addEventListener('click', () => {
-                const product = {
-                    name: modalTitle.textContent,
-                    price: basePrice * currentQuantity,
-                    quantity: currentQuantity,
-                    size: selectedSize,
-                    id: modal.dataset.id
-                };
-
-                cart.push(product);
-                updateOrderSummary();
-                modal.classList.add('hidden');
-            });
-
-            // Handle canceling the modal
-            cancelModalBtn.addEventListener('click', () => {
-                modal.classList.add('hidden');
-            });
-
-            // Handle quantity change
+            // Event listeners for increasing/decreasing quantity
             document.getElementById('increase-qty').addEventListener('click', () => {
                 currentQuantity++;
                 quantityDisplay.textContent = currentQuantity;
@@ -266,62 +241,48 @@
                 }
             });
 
-            // Handle review order button
+            // Add item to the order
+            addToOrderBtn.addEventListener('click', () => {
+                const cartItem = {
+                    id: `${modal.dataset.id}-${selectedSize}`,
+                    name: modalTitle.textContent,
+                    size: selectedSize,
+                    quantity: currentQuantity,
+                    price: basePrice * currentQuantity
+                };
+
+                const existingIndex = cart.findIndex(item => item.id === cartItem.id);
+                if (existingIndex >= 0) {
+                    // Update existing item in the cart
+                    cart[existingIndex].quantity += cartItem.quantity;
+                    cart[existingIndex].price = cart[existingIndex].quantity * basePrice;
+                } else {
+                    cart.push(cartItem);
+                }
+
+                updateOrderSummary();
+                modal.classList.add('hidden'); // Close modal
+            });
+            
+            // Close the product modal
+            cancelModalBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            // Review order modal
             reviewOrderBtn.addEventListener('click', () => {
                 orderModal.classList.remove('hidden');
             });
 
-            // Close order modal
             closeOrderModalBtn.addEventListener('click', () => {
                 orderModal.classList.add('hidden');
             });
 
-            // Cancel the order
             cancelOrderBtn.addEventListener('click', () => {
                 cart = [];
                 updateOrderSummary();
                 orderModal.classList.add('hidden');
             });
-
-            attachMenuItemEvents();
-            
-            // Initialize by showing all products
-            fetch('/kiosk/products/all')
-                .then(response => response.json())
-                .then(products => {
-                    clearProductGrid();
-                    products.forEach(product => {
-                        let price = product.category_type === 'food'
-                            ? product.sizes && product.sizes.length > 0
-                                ? product.sizes[0].price
-                                : '0.00'
-                            : product.price || '0.00';
-
-                        const menuItem = document.createElement('div');
-                        menuItem.classList.add('menu-item');
-                        menuItem.dataset.name = product.name;
-                        menuItem.dataset.category = product.category_type;
-                        menuItem.dataset.price = price;
-                        menuItem.dataset.image = `/uploads/${product.product_image}`;
-                        menuItem.dataset.sizes = JSON.stringify(product.sizes || []);
-                        menuItem.dataset.id = product.product_id;
-
-                        const img = document.createElement('img');
-                        img.src = `/uploads/${product.product_image}`;
-                        img.alt = product.name;
-
-                        const h3 = document.createElement('h3');
-                        h3.textContent = product.name;
-
-                        menuItem.appendChild(img);
-                        menuItem.appendChild(h3);
-
-                        document.getElementById('menu-grid').appendChild(menuItem);
-                    });
-
-                    attachMenuItemEvents();
-                })
-                .catch(error => console.error('Error fetching products:', error));
         });
     </script>
 </body>
