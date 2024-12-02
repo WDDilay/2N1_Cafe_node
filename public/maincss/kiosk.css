@@ -107,6 +107,8 @@ body, html {
 .menu-item img {
   width: 130px;
   height: 150px;
+  border-radius: 10px;
+  margin-top: 10px;
   object-fit: cover;
 }
 
@@ -141,6 +143,7 @@ body, html {
   overflow-y: auto;
   text-align: center;
   padding-bottom: 50px; /* Prevent overlap with modal */
+  padding-right: 10px;
 }
 
 .review-order-btn {
@@ -166,7 +169,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* Ensure modal appears above other content */
+  z-index: 1000; 
 }
 
 .hidden {
@@ -179,11 +182,14 @@ body, html {
   padding: 20px;
   text-align: center;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
+  max-height: 80vh; /* Limit modal height */
 }
 
 .modal-content img {
-  max-width: 100%;
+  width: 200px;  
+  height: 200px;
+  object-fit: cover; 
   border-radius: 10px;
   margin-bottom: 15px;
 }
@@ -251,8 +257,9 @@ body, html {
 /* Main order summary container */
 .order-summary {
   max-width: 800px;
-  margin: 0 auto; /* Center align the order summary */
+  margin: 0 auto; 
   padding: 12px;
+  min-height: 300px;
 }
 
 .order-summary::-webkit-scrollbar {
@@ -289,7 +296,8 @@ body, html {
   border-radius: 6px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  width: 100%;
+  width: auto;
+  box-sizing: border-box;
 }
 
 /* Item details styling */
@@ -297,6 +305,9 @@ body, html {
   font-size: 16px;
   color: #333;
   line-height: 1.5;
+  flex: 1;
+  text-align: left; /* Ensure text is left-aligned */
+  padding-right: 10px; 
 }
 
 /* Ensure prices are aligned */
