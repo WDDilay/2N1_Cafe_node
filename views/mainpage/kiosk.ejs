@@ -214,13 +214,22 @@
 
     // Cancel Order
     cancelOrderBtn.addEventListener('click', () => {
-        fetch('/cart/clear', { method: 'POST' }) // Clear all cart items via backend
-            .then(() => {
-                fetchCartItems(); // Update cart items after clearing
-                reviewOrderModal.classList.add('hidden');
-            })
-            .catch(error => console.error('Error clearing cart:', error));
-    });
+    fetch('/cart/items', { method: 'DELETE' }) // Call the delete endpoint
+        .then(response => {
+            if (response.ok) {
+                fetchCartItems(); // Refresh the cart summary
+                reviewOrderModal.classList.add('hidden'); // Hide the modal
+                showToast('Order canceled successfully!'); // Optional feedback
+            } else {
+                console.error('Failed to clear cart:', response.statusText);
+                showToast('Failed to cancel order. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error clearing cart:', error);
+            showToast('An error occurred while canceling the order.');
+        });
+});
 
     // Quantity increase
     increaseQtyBtn.addEventListener('click', () => {
@@ -331,15 +340,16 @@ function attachDeleteEvents() {
         button.addEventListener('click', () => {
             const cartItemId = button.getAttribute('data-id');
 
-            // Send delete request to backend
+            // Send DELETE request to the backend
             fetch(`/cart/item/${cartItemId}`, { method: 'DELETE' })
                 .then(() => {
-                    fetchCartItems(); // Refresh cart items after deletion
+                    fetchCartItems(); // Refresh the cart items after deletion
                 })
                 .catch(error => console.error('Error deleting cart item:', error));
         });
     });
 }
+
 
 
 
@@ -359,9 +369,10 @@ function updateFooterSummary(cartItems) {
         totalItems += item.quantity;
     });
 
-    // Update footer with total items only
+    // Update footer with total items
     totalCostDiv.textContent = `Total Items: ${totalItems} items in the cart`;
 }
+
 
 
 
