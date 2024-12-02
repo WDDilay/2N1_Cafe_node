@@ -2,21 +2,50 @@ const db = require('../config/db.js');
 
 const cartModel = {
     addItemToCart: (cartId, productId, size, quantity, price, callback) => {
-        const query = `
-            INSERT INTO cart_items (cart_id, product_id, size, quantity, price)
-            VALUES (?, ?, ?, ?, ?)
+        // Check if the item already exists in the cart
+        const checkQuery = `
+            SELECT * 
+            FROM cart_items 
+            WHERE cart_id = ? AND product_id = ? AND size = ?
         `;
-
-        // Execute the query
-        db.query(query, [cartId, productId, size, quantity, price], (err, result) => {
+    
+        db.query(checkQuery, [cartId, productId, size], (err, results) => {
             if (err) {
                 console.error('Database error:', err);
                 return callback(err);
             }
-
-            callback(null, result); // Send back the result of the query
+    
+            if (results.length > 0) {
+                // If the item exists, update the quantity
+                const updateQuery = `
+                    UPDATE cart_items 
+                    SET quantity = quantity + ? 
+                    WHERE cart_item_id = ?
+                `;
+                db.query(updateQuery, [quantity, results[0].cart_item_id], (err, result) => {
+                    if (err) {
+                        console.error('Database error:', err);
+                        return callback(err);
+                    }
+                    callback(null, result);
+                });
+            } else {
+                // If the item does not exist, insert it
+                const insertQuery = `
+                    INSERT INTO cart_items (cart_id, product_id, size, quantity, price)
+                    VALUES (?, ?, ?, ?, ?)
+                `;
+                db.query(insertQuery, [cartId, productId, size, quantity, price], (err, result) => {
+                    if (err) {
+                        console.error('Database error:', err);
+                        return callback(err);
+                    }
+                    callback(null, result);
+                });
+            }
         });
     },
+    
 
     getCartItems: (cartId, callback) => {
         const query = `

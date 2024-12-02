@@ -67,14 +67,13 @@
                         <button id="proceed-to-payment" class="modal-btn">Proceed to Payment</button>
                     </div>
                 </div>
-            </div>            
+            </div>
+                       
             <footer class="footer">
                 <div class="total-cost">Total Items: No items in cart</div>
-                <div class="order-summary">
-                    <!-- Order summary will be populated dynamically -->
-                </div>
                 <button class="review-order-btn">Review Order</button>
             </footer>
+                       
         </main>
     </div>
 </body>
@@ -202,12 +201,11 @@
     }
 
     
-    if (reviewOrderBtn) {
-        reviewOrderBtn.addEventListener('click', () => {
-            fetchCartItems(); // Update cart items before showing modal
-            reviewOrderModal.classList.remove('hidden');
-        });
-    }
+    reviewOrderBtn.addEventListener('click', () => {
+    fetchCartItems(); // Fetch and display cart items
+    reviewOrderModal.classList.remove('hidden'); // Show the modal
+});
+
 
     // Close Review Order Modal (Back to Menu)
     backToMenuBtn.addEventListener('click', () => {
@@ -242,105 +240,131 @@
 
     // Add to Order functionality
     addToOrderBtn.addEventListener('click', () => {
-        const productId = modal.getAttribute('data-id');
-        const size = selectedSize;
-        const quantity = currentQuantity;
-        const price = basePrice * quantity;
+    const productId = modal.getAttribute('data-id');
+    const size = selectedSize;
+    const quantity = currentQuantity;
+    const price = basePrice * quantity;
 
-        // Send data to the backend
-        fetch('/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                productId: parseInt(productId),
-                size: size,
-                quantity: parseInt(quantity),
-                price: parseFloat(price),
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Fetch the updated cart items after adding the new product
-            fetchCartItems();  // Fetch cart items to update order summary
-        })
-        .catch(error => console.error('Error adding to cart:', error));
+    // Send data to the backend
+    fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            productId: parseInt(productId),
+            size: size,
+            quantity: parseInt(quantity),
+            price: parseFloat(price),
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Fetch the updated cart items after adding the new product
+        fetchCartItems(); // Fetch cart items to update order summary
+    })
+    .catch(error => console.error('Error adding to cart:', error));
 
-        modal.classList.add('hidden'); // Hide modal
-    });
+    modal.classList.add('hidden'); // Hide modal
+});
+
 
     // Fetch cart items and update the order summary
-    function fetchCartItems() {
-        fetch('/cart/items') // Make sure this endpoint returns all cart items
-            .then(response => response.json())
-            .then(cartItems => {
-                updateOrderSummary(cartItems); // Update the order summary dynamically
-            })
-            .catch(error => console.error('Error fetching cart items:', error));
-    }
+    // Fetch cart items and update the order summary and footer
+function fetchCartItems() {
+    fetch('/cart/items') // Fetch cart items from the backend
+        .then(response => response.json())
+        .then(cartItems => {
+            console.log('Fetched cart items:', cartItems); // Debugging
+            updateOrderSummary(cartItems); // Update modal order summary
+            updateFooterSummary(cartItems); // Update footer total items & cost
+        })
+        .catch(error => console.error('Error fetching cart items:', error));
+}
+
+
 
     // Function to update the order summary
-    function updateOrderSummary(cartItems) {
-    const orderSummary = document.querySelector('.order-summary');
-    const totalCostDiv = document.querySelector('.total-cost');
-    orderSummary.innerHTML = ''; // Clear existing items
+    // Function to update the order summary modal
+// Function to update the order summary modal
+function updateOrderSummary(cartItems) {
+    const orderSummary = document.querySelector('.order-items-container'); // Modal container
 
-    let totalItems = 0; // Initialize a counter for total items
+    // Clear existing items in the modal
+    orderSummary.innerHTML = '';
 
-    // Create a wrapper div for all items
-    const orderSummaryList = document.createElement('div');
-    orderSummaryList.classList.add('order-summary-list');
+    let totalCost = 0;
 
-    // Loop through cart items and create a summary item for each one
+    // Loop through cart items and create summary entries
     cartItems.forEach(item => {
-        totalItems += item.quantity; // Add the quantity of each item to the total count
+        totalCost += item.price * item.quantity;
 
-        const price = parseFloat(item.price) || 0; // Default to 0 if invalid
-
-        // Create a container for each cart item
-        const itemContainer = document.createElement('div');
-        itemContainer.classList.add('order-summary-item');
-        
-        // Create item details as a separate div
-        const itemDetailsDiv = document.createElement('div');
-        itemDetailsDiv.classList.add('order-item-details');
-        itemDetailsDiv.innerHTML = `
-            ${item.quantity}x ${item.name} (${item.size}) - ₱ ${price.toFixed(2)}
+        const itemHTML = `
+            <div class="order-summary-item">
+                <span>${item.quantity}x ${item.name} (${item.size || ''})</span>
+                <span>₱${(item.price * item.quantity).toFixed(2)}</span>
+                <button class="delete-btn" data-id="${item.cart_item_id}">
+                    🗑️
+                </button>
+            </div>
         `;
-
-        // Create the delete button
-        const deleteButton = document.createElement('button');
-        deleteButton.classList.add('delete-btn');
-        deleteButton.dataset.id = item.product_id; // Add product ID as a data attribute
-        deleteButton.textContent = 'Delete';
-
-        // Add event listener for delete button
-        deleteButton.addEventListener('click', () => {
-            deleteCartItem(item.product_id); // Call delete function when clicked
-        });
-
-        // Append item details and delete button to the item container
-        itemContainer.appendChild(itemDetailsDiv);
-        itemContainer.appendChild(deleteButton);
-
-        // Append the item container to the order summary list
-        orderSummaryList.appendChild(itemContainer);
+        orderSummary.innerHTML += itemHTML;
     });
 
-    // Append the orderSummaryList to the main orderSummary div
-    orderSummary.appendChild(orderSummaryList);
+    // Append the total price at the bottom of the modal
+    const totalHTML = `
+        <div class="order-summary-total">
+            <strong>Total Price:</strong> ₱${totalCost.toFixed(2)}
+        </div>
+    `;
+    orderSummary.innerHTML += totalHTML;
 
-    // Update total cost display with the total number of items
-    if (totalCostDiv) {
-        totalCostDiv.innerHTML = `<strong>Total Items:</strong> ${totalItems} items in cart`;
-    } else {
-        const newTotalCostDiv = document.createElement('div');
-        newTotalCostDiv.classList.add('total-cost');
-        newTotalCostDiv.innerHTML = `<strong>Total Items:</strong> ${totalItems} items in cart`;
-        document.querySelector('.footer').appendChild(newTotalCostDiv);
-    }
+    // Attach click event to delete buttons
+    attachDeleteEvents();
 }
+
+// Function to attach delete events to the delete buttons
+function attachDeleteEvents() {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const cartItemId = button.getAttribute('data-id');
+
+            // Send delete request to backend
+            fetch(`/cart/item/${cartItemId}`, { method: 'DELETE' })
+                .then(() => {
+                    fetchCartItems(); // Refresh cart items after deletion
+                })
+                .catch(error => console.error('Error deleting cart item:', error));
+        });
+    });
+}
+
+
+
+// Function to update the footer with cart totals
+function updateFooterSummary(cartItems) {
+    const totalCostDiv = document.querySelector('.total-cost');
+
+    if (!totalCostDiv) {
+        console.error('Footer container not found!');
+        return;
+    }
+
+    let totalItems = 0;
+
+    // Calculate total items
+    cartItems.forEach(item => {
+        totalItems += item.quantity;
+    });
+
+    // Update footer with total items only
+    totalCostDiv.textContent = `Total Items: ${totalItems} items in the cart`;
+}
+
+
+
 
     fetchCartItems(); 
 
