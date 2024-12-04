@@ -95,6 +95,7 @@
     const reviewOrderBtn = document.querySelector('.review-order-btn');
     const backToMenuBtn = document.getElementById('back-to-menu');
     const cancelOrderBtn = document.getElementById('cancel-order');
+    const proceedToPaymentButton = document.getElementById('proceed-to-payment');
 
     let currentQuantity = 1;
     let selectedSize = 'Medium'; // Default size
@@ -228,6 +229,26 @@
         .catch(error => {
             console.error('Error clearing cart:', error);
             showToast('An error occurred while canceling the order.');
+        });
+});
+
+proceedToPaymentButton.addEventListener('click', () => {
+    const cartId = 1; // Replace with your actual cart ID logic
+
+    fetch('/cart/proceed-to-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cartId }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            alert(data.message); // Notify the user
+            if (data.order_no) {
+                console.log(`Order No: ${data.order_no}`);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
         });
 });
 

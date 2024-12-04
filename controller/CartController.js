@@ -95,6 +95,19 @@ const cartController = {
                 data: result,
             });
         });
+    },
+
+    proceedToPayment: (req, res) => {
+        const cartId = req.body.cartId; // Assume cartId is sent in the request body
+    
+        cartModel.proceedToOrder(cartId, (err, result) => {
+            if (err) {
+                console.error('Error processing order:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+    
+            res.json(result);
+        });
     }
 };
 

@@ -62,5 +62,7 @@ router.delete('/cart/item/:cartItemId', cartController.deleteCartItem);
 // Route to delete all cart items
 router.delete('/cart/items', cartController.deleteAllCartItems);
 
+router.post('/cart/proceed-to-payment', cartController.proceedToPayment);
+
 
 module.exports = router;
