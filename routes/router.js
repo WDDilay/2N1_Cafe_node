@@ -6,6 +6,7 @@ const pcontroller = require('../controller/ProductController.js');
 const ccontroller = require('../controller/Category.js');
 const mcontroller = require('../controller/MainController.js');
 const cartController = require('../controller/CartController.js');
+const orderController = require('../controller/Order.js');
 
 const multer = require('multer');
 
@@ -58,11 +59,12 @@ router.get('/kiosk/products/:category_id', mcontroller.filterProductsByCategory)
 router.post('/cart/add', cartController.addToCart);
 router.get('/cart/items', cartController.getCartItems);
 router.delete('/cart/item/:cartItemId', cartController.deleteCartItem);
-
-// Route to delete all cart items
 router.delete('/cart/items', cartController.deleteAllCartItems);
-
 router.post('/cart/proceed-to-payment', cartController.proceedToPayment);
+
+
+//order routes
+router.get('/orders', orderController.orders);
 
 
 module.exports = router;

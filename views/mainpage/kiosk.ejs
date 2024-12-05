@@ -242,15 +242,25 @@ proceedToPaymentButton.addEventListener('click', () => {
     })
         .then((response) => response.json())
         .then((data) => {
-            alert(data.message); // Notify the user
+            if (data.message) {
+                alert(data.message); // Notify the user
+            }
+
             if (data.order_no) {
                 console.log(`Order No: ${data.order_no}`);
             }
+
+            // Close the modal
+            reviewOrderModal.classList.add('hidden');
+
+            // Redirect to the kiosk (or desired page)
+            window.location.href = '/kiosk'; // Update this path if necessary
         })
         .catch((error) => {
             console.error('Error:', error);
         });
 });
+
 
     // Quantity increase
     increaseQtyBtn.addEventListener('click', () => {
