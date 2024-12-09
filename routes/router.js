@@ -65,6 +65,7 @@ router.post('/cart/proceed-to-payment', cartController.proceedToPayment);
 
 //order routes
 router.get('/orders', orderController.orders);
+router.post('/orders/mark-done', orderController.markDone);
 
 
 module.exports = router;

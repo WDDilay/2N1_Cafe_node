@@ -11,6 +11,20 @@ const orderController = {
             res.render('admin/orders', { orders });
         });
     },
+
+    markDone: (req, res) => {
+        const { order_no } = req.body;
+    
+        orderModel.markAsDone(order_no, (err) => {
+            if (err) {
+                console.error('Error marking order as done:', err);
+                return res.status(500).send('Error marking order as done');
+            }
+            res.send({ message: 'Order marked as done and recorded in sales.' });
+        });
+    }
+
+   
     
 
     

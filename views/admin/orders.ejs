@@ -45,7 +45,16 @@
                                             <td><%= order.sizes %></td>
                                             <td><%= order.quantities %></td>
                                             <td><%= order.total_amount %></td>
-                                            <td><%= order.status %></td>
+                                            <td>
+                                                <%= order.status %>
+                                                <% if (order.status === 'on_queue') { %>
+                                                    <button 
+                                                        class="btn btn-success btn-sm mark-done" 
+                                                        data-order-no="<%= order.order_no %>">
+                                                        Mark as Done
+                                                    </button>
+                                                <% } %>
+                                            </td>
                                         </tr>
                                     <% }); %>
                                 <% } else { %>
@@ -80,29 +89,25 @@
     <!-- https://getbootstrap.com/ -->
     <script src="js/tooplate-scripts.js"></script>
     <script>
-        Chart.defaults.global.defaultFontColor = 'white';
-        let ctxLine,
-            ctxBar,
-            ctxPie,
-            optionsLine,
-            optionsBar,
-            optionsPie,
-            configLine,
-            configBar,
-            configPie,
-            lineChart;
-        barChart, pieChart;
-        // DOM is ready
-        $(function () {
-            drawLineChart(); // Line Chart
-            drawBarChart(); // Bar Chart
-            drawPieChart(); // Pie Chart
+         $(document).on("click", ".mark-done", function () {
+        const orderNo = $(this).data("order-no");
 
-            $(window).resize(function () {
-                updateLineChart();
-                updateBarChart();                
+        if (confirm("Are you sure you want to mark this order as done?")) {
+            $.ajax({
+                url: "/orders/mark-done", // Backend endpoint
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ order_no: orderNo }),
+                success: function (response) {
+                    alert(response.message);
+                    location.reload(); // Reload the page to reflect changes
+                },
+                error: function (xhr) {
+                    alert("Error: " + xhr.responseText);
+                }
             });
-        })
+        }
+    });
     </script>
 </body>
 
