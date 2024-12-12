@@ -34,6 +34,7 @@
                                     <th scope="col">QUANTITY</th>
                                     <th scope="col">TOTAL AMOUNT</th>
                                     <th scope="col">STATUS</th>
+                                    <th scope="col">MARK</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,7 +48,9 @@
                                             <td><%= order.total_amount %></td>
                                             <td>
                                                 <%= order.status %>
-                                                <% if (order.status === 'on_queue') { %>
+                                            </td>
+                                            <td>
+                                                <% if (order.status === 'Preparing') { %>
                                                     <button 
                                                         class="btn btn-success btn-sm mark-done" 
                                                         data-order-no="<%= order.order_no %>">
@@ -68,15 +71,6 @@
                 </div>
             
         </div>
-        <footer class="tm-footer row tm-mt-small">
-            <div class="col-12 font-weight-light">
-                <p class="text-center text-white mb-0 px-4 small">
-                    Copyright &copy; <b>2018</b> All rights reserved. 
-                    
-                    Design: <a rel="nofollow noopener" href="https://templatemo.com" class="tm-footer-link">Template Mo</a>
-                </p>
-            </div>
-        </footer>
     </div>
 
     <script src="js/jquery-3.3.1.min.js"></script>
@@ -89,25 +83,29 @@
     <!-- https://getbootstrap.com/ -->
     <script src="js/tooplate-scripts.js"></script>
     <script>
-         $(document).on("click", ".mark-done", function () {
-        const orderNo = $(this).data("order-no");
+        $(document).on("click", ".mark-done", function () {
+    const orderNo = $(this).data("order-no");
 
-        if (confirm("Are you sure you want to mark this order as done?")) {
-            $.ajax({
-                url: "/orders/mark-done", // Backend endpoint
-                method: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({ order_no: orderNo }),
-                success: function (response) {
-                    alert(response.message);
-                    location.reload(); // Reload the page to reflect changes
-                },
-                error: function (xhr) {
-                    alert("Error: " + xhr.responseText);
-                }
-            });
+    console.log('Sending order number to server:', orderNo);
+
+    if (confirm("Are you sure you want to mark this order as done?")) {
+      $.ajax({
+        url: "/orders/mark-done",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ order_no: orderNo }),
+        success: function (response) {
+          console.log('Server response:', response);
+          alert(response.message);
+          location.reload();
+        },
+        error: function (xhr) {
+          console.error('AJAX error:', xhr.responseText);
+          alert("Error: " + xhr.responseText);
         }
-    });
+      });
+    }
+  });
     </script>
 </body>
 

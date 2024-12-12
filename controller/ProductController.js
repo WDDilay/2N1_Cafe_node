@@ -15,9 +15,6 @@ const p = {
         });
     },
 
-    admin: (req, res) => {
-        res.render('admin/admin');
-    },
     
     addForm: (req, res) => {
         product.get((err, result) => {

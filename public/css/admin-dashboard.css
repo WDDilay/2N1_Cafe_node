@@ -1,0 +1,42 @@
+.tm-block-small {
+    min-height: auto;
+    height: 150px;
+}
+.tm-block-graph {
+    height: 250px;
+}
+.tm-block-small .tm-block-title,
+.tm-block-graph .tm-block-title {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+.tm-block-small h3,
+.tm-block-small p,
+.tm-block-graph .tm-block-content {
+    font-size: 1rem;
+    margin: 0;
+}
+.tm-block-small ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+.tm-block-small li {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+.tm-block-graph .tm-block-content {
+    height: calc(100% - 40px);
+}
+#salesChart,
+#performanceChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+.tm-content-row .tm-block-col {
+    padding: 10px;
+}
+.tm-block {
+    margin: 0;
+    box-sizing: border-box;
+}

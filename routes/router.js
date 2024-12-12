@@ -35,7 +35,6 @@ router.get('/account', ucontroller.account);
 
 //product routes
 router.get('/product', pcontroller.product);
-router.get('/admin', pcontroller.admin);
 router.get('/add-form', pcontroller.addForm);
 router.post('/add-products', upload.single('product_image'), pcontroller.addProducts);
 router.post('/delete-product/:product_id', pcontroller.deleteProduct);
@@ -66,6 +65,7 @@ router.post('/cart/proceed-to-payment', cartController.proceedToPayment);
 //order routes
 router.get('/orders', orderController.orders);
 router.post('/orders/mark-done', orderController.markDone);
+router.get('/admin', orderController.admin);
 
 
 module.exports = router;
