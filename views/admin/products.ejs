@@ -120,6 +120,17 @@
         }
     });
 });
+$(document).ready(function() {
+    $('#dailyReportLink').on('click', function(e) {
+        e.preventDefault(); // Prevent the default link action
+
+        // Get the current date to append it to the URL query (if needed)
+        const today = new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+        // Redirect to the export-sales route to trigger the download
+        window.location.href = `/export-sales?startDate=${today}&endDate=${today}`;
+    });
+});
 
     </script>
   </body>

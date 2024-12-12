@@ -138,10 +138,16 @@ const orderController = {
         });
       },
 
-   
-    
+      todaysSales: (req, res) => {
+        orderModel.getTodaysSales((err, salesData) => {
+          if (err) {
+            console.error('Error fetching today\'s sales:', err);
+            return res.status(500).send('Error fetching sales data');
+          }
+          res.status(200).json(salesData);
+        });
+      }
 
-    
 };
 
 module.exports = orderController;

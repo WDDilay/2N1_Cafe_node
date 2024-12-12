@@ -344,7 +344,7 @@ function updateOrderSummary(cartItems) {
                 <span>${item.quantity}x ${item.name} (${item.size || ''})</span>
                 <span>₱${(item.price * item.quantity).toFixed(2)}</span>
                 <button class="delete-btn" data-id="${item.cart_item_id}">
-                    🗑️
+                    Delete
                 </button>
             </div>
         `;

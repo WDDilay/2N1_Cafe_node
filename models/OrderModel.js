@@ -192,6 +192,30 @@ getWeeklySales: (startDate, endDate, callback) => {
     if (err) return callback(err);
     callback(null, results);
   });
+},
+
+getTodaysSales : (callback) => {
+  const query = `
+    SELECT 
+  ROW_NUMBER() OVER (ORDER BY s.created_at) AS sale_number,
+  GROUP_CONCAT(p.name ORDER BY p.name SEPARATOR ', ') AS product_names,
+  GROUP_CONCAT(si.quantity ORDER BY p.name SEPARATOR ', ') AS quantities,
+  SUM(s.total_amount) AS total_amount
+FROM sales s
+JOIN sales_items si ON s.sale_id = si.sale_id
+JOIN products p ON si.product_id = p.product_id
+WHERE DATE(s.created_at) = CURDATE()
+GROUP BY s.sale_id
+ORDER BY s.created_at;
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching today\'s sales:', err);
+      return callback(err, null);
+    }
+    callback(null, results);
+  });
 }
     
 };

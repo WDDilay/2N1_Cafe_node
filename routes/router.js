@@ -67,6 +67,7 @@ router.get('/orders', orderController.orders);
 router.post('/orders/mark-done', orderController.markDone);
 router.get('/admin', orderController.admin);
 router.get('/export-sales', orderController.exportSales);
+router.get('/today-sales', orderController.todaysSales);
 
 
 module.exports = router;

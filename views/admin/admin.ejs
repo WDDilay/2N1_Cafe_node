@@ -37,7 +37,7 @@
                         <ul>
                             <% topBestSellers.forEach((product) => { %>
                                 <li>
-                                    <strong class="text-center text-white"><%= product.name %> - <%= product.total_quantity %> sold</strong> 
+                                    <strong class="text-center text-white"><%= product.name %> <!--- <%= product.total_quantity %> sold--></strong> 
                                 </li>
                             <% }); %>
                         </ul>
@@ -126,6 +126,45 @@
     // Log the data to check if it's properly loaded
     console.log('Daily Sales Data:', dailySalesData);
     console.log('Weekly Sales Data:', weeklySalesData);
+
+    document.addEventListener('DOMContentLoaded', function() {
+    fetch('/today-sales') // Replace with your endpoint
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector('.table tbody');
+tbody.innerHTML = '';
+
+if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No sales today</td></tr>';
+    return;
+}
+
+data.forEach(sale => {
+    const row = `
+        <tr>
+            <th scope="row">#${sale.sale_number}</th>
+            <td>${sale.product_names}</td>
+            <td>${sale.quantities}</td>
+            <td>₱${sale.total_amount.toLocaleString()}</td>
+        </tr>
+    `;
+    tbody.innerHTML += row;
+});
+        })
+        .catch(err => console.error('Error fetching sales data:', err));
+});
+
+$(document).ready(function() {
+    $('#dailyReportLink').on('click', function(e) {
+        e.preventDefault(); // Prevent the default link action
+
+        // Get the current date to append it to the URL query (if needed)
+        const today = new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+        // Redirect to the export-sales route to trigger the download
+        window.location.href = `/export-sales?startDate=${today}&endDate=${today}`;
+    });
+});
 </script>
 <script src="/js/admin-dashboard.js"></script>
 </body>
