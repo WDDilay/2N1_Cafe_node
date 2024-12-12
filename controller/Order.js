@@ -1,6 +1,63 @@
 const orderModel = require('../models/OrderModel');
+const ExcelJS = require('exceljs');
 
 const orderController = {
+  exportSales: async (req, res) => {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const { startDate = today, endDate = today } = req.query;
+
+        orderModel.getSalesData(startDate, endDate, async (err, salesData) => {
+            if (err) {
+                console.error('Error fetching sales data:', err);
+                return res.status(500).send('Error fetching sales data');
+            }
+
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Sales Report');
+
+            worksheet.columns = [
+                { header: 'Product', key: 'product', width: 30 },
+                { header: 'Size', key: 'size', width: 10 },
+                { header: 'Quantity Sold', key: 'quantity', width: 15 },
+                { header: 'Total Amount', key: 'amount', width: 15 }
+            ];
+
+            let grandTotalQuantity = 0;
+            let grandTotalAmount = 0;
+
+            salesData.forEach(item => {
+                worksheet.addRow({
+                    product: item.product_name,
+                    size: item.size,
+                    quantity: item.quantity_sold,
+                    amount: item.total_amount
+                });
+                grandTotalQuantity += Number(item.quantity_sold);
+                grandTotalAmount += Number(item.total_amount);
+            });
+
+            worksheet.addRow({
+                product: 'Grand Total',
+                size: '',
+                quantity: grandTotalQuantity,
+                amount: grandTotalAmount
+            });
+
+            const filename = `SalesReport_${startDate}.xlsx`;
+
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+            await workbook.xlsx.write(res);
+            res.end();
+        });
+    } catch (error) {
+        console.error('Error exporting sales data:', error);
+        res.status(500).send('Error exporting sales data');
+    }
+  }
+,
     orders: (req, res) => {
         orderModel.getAllOrders((err, orders) => {
             if (err) {
@@ -34,34 +91,52 @@ const orderController = {
       },
 
       admin: (req, res) => {
+        const endDate = new Date().toISOString().split('T')[0];
+        const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
         orderModel.getTotalSales((err, totalSales) => {
+          if (err) {
+            console.error('Error fetching total sales:', err);
+            totalSales = 0;
+          }
+    
+          orderModel.getTopBestSellers((err, topBestSellers) => {
             if (err) {
-                console.error('Error fetching total sales:', err);
-                totalSales = 0; // Default to 0 in case of an error
+              console.error('Error fetching top best sellers:', err);
+              topBestSellers = [];
             }
     
-            orderModel.getTopBestSellers((err, topBestSellers) => {
+            orderModel.getDailySales(startDate, endDate, (err, dailySales) => {
+              if (err) {
+                console.error('Error fetching daily sales:', err);
+                dailySales = [];
+              }
+    
+              orderModel.getWeeklySales(startDate, endDate, (err, weeklySales) => {
                 if (err) {
-                    console.error('Error fetching top best sellers:', err);
-                    topBestSellers = []; // Default to an empty array
+                  console.error('Error fetching weekly sales:', err);
+                  weeklySales = [];
                 }
     
                 orderModel.getAllOrders((err, orders) => {
-                    if (err) {
-                        console.error('Error fetching orders:', err);
-                        orders = []; // Default to empty array
-                    }
+                  if (err) {
+                    console.error('Error fetching orders:', err);
+                    orders = [];
+                  }
     
-                    // Ensure totalSales is a float before sending to EJS
-                    res.render('admin/admin', {
-                        totalSales: totalSales, // Already a float from OrderModel
-                        topBestSellers,
-                        orders,
-                    });
+                  res.render('admin/admin', {
+                    totalSales,
+                    topBestSellers,
+                    orders,
+                    dailySales: JSON.stringify(dailySales),
+                    weeklySales: JSON.stringify(weeklySales)
+                  });
                 });
+              });
             });
+          });
         });
-    },
+      },
 
    
     

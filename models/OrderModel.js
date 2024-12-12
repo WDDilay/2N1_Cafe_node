@@ -93,34 +93,105 @@ const orderModel = {
         const query = `
             SELECT SUM(total_amount) AS total_sales
             FROM sales
-            WHERE status = 'Completed'
+            WHERE status = 'Completed' AND DATE(created_at) = CURDATE()
         `;
     
         db.query(query, (err, results) => {
             if (err) return callback(err);
     
-            // Default to 0 if no total_sales is returned or it's null
             const totalSales = parseFloat(results[0]?.total_sales) || 0;
             callback(null, totalSales);
         });
     },
 
     getTopBestSellers: (callback) => {
-    const query = `
-        SELECT p.name, SUM(si.quantity) AS total_quantity
-        FROM sales_items si
-        JOIN products p ON si.product_id = p.product_id
-        JOIN sales s ON si.sale_id = s.sale_id
-        WHERE s.status = 'Completed'
-        GROUP BY p.product_id
-        ORDER BY total_quantity DESC
-        LIMIT 3
-    `;
+      const query = `
+          SELECT p.name, SUM(si.quantity) AS total_quantity
+          FROM sales_items si
+          JOIN products p ON si.product_id = p.product_id
+          JOIN sales s ON si.sale_id = s.sale_id
+          WHERE s.status = 'Completed' AND DATE(s.created_at) = CURDATE()
+          GROUP BY p.product_id
+          ORDER BY total_quantity DESC
+          LIMIT 3
+      `;
+  
+      db.query(query, (err, results) => {
+          if (err) return callback(err);
+          callback(null, results);
+      });
+  },
 
-    db.query(query, (err, results) => {
-        if (err) return callback(err);
-        callback(null, results);
-    });
+getSalesData: (startDate, endDate, callback) => {
+  const query = `
+    SELECT 
+      p.name AS product_name, 
+      ps.name AS size, 
+      SUM(si.quantity) AS quantity_sold, 
+      SUM(si.quantity * ps.price) AS total_amount
+    FROM 
+      sales s
+      JOIN sales_items si ON s.sale_id = si.sale_id
+      JOIN products p ON si.product_id = p.product_id
+      JOIN product_sizes ps ON si.product_id = ps.product_id AND si.size = ps.name
+    WHERE 
+      s.status = 'Completed'
+      AND DATE(s.created_at) BETWEEN ? AND ?
+    GROUP BY 
+      p.product_id, ps.name
+    ORDER BY 
+      quantity_sold DESC
+  `;
+
+  db.query(query, [startDate, endDate], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results);
+  });
+},
+
+getDailySales: (startDate, endDate, callback) => {
+  const query = `
+    SELECT 
+      DATE(created_at) AS date,
+      SUM(total_amount) AS total_sales
+    FROM 
+      sales
+    WHERE 
+      status = 'Completed'
+      AND DATE(created_at) BETWEEN ? AND ?
+    GROUP BY 
+      DATE(created_at)
+    ORDER BY 
+      DATE(created_at)
+  `;
+
+  db.query(query, [startDate, endDate], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results);
+  });
+},
+
+getWeeklySales: (startDate, endDate, callback) => {
+  const query = `
+    SELECT 
+      YEAR(created_at) AS year,
+      WEEK(created_at, 1) AS week,
+      SUM(total_amount) AS total_sales
+    FROM 
+      sales
+    WHERE 
+      status = 'Completed'
+      AND DATE(created_at) BETWEEN ? AND ?
+    GROUP BY 
+      YEAR(created_at), WEEK(created_at, 1)
+    ORDER BY 
+      YEAR(created_at), WEEK(created_at, 1)
+  `;
+
+  db.query(query, [startDate, endDate], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results);
+  });
 }
     
 };
