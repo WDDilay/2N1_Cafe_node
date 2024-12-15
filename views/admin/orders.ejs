@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <!-- https://getbootstrap.com/ -->
     <link rel="stylesheet" href="css/templatemo-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!--
 	Product Admin CSS Template
 	https://templatemo.com/tm-524-product-admin
@@ -83,41 +84,59 @@
     <!-- https://getbootstrap.com/ -->
     <script src="js/tooplate-scripts.js"></script>
     <script>
-        $(document).on("click", ".mark-done", function () {
-    const orderNo = $(this).data("order-no");
+      $(document).on("click", ".mark-done", function () {
+        const orderNo = $(this).data("order-no");
 
-    console.log('Sending order number to server:', orderNo);
+        console.log('Sending order number to server:', orderNo);
 
-    if (confirm("Are you sure you want to mark this order as done?")) {
-      $.ajax({
-        url: "/orders/mark-done",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({ order_no: orderNo }),
-        success: function (response) {
-          console.log('Server response:', response);
-          alert(response.message);
-          location.reload();
-        },
-        error: function (xhr) {
-          console.error('AJAX error:', xhr.responseText);
-          alert("Error: " + xhr.responseText);
-        }
-      });
-    }
-  });
-
-  $(document).ready(function() {
-    $('#dailyReportLink').on('click', function(e) {
-        e.preventDefault(); // Prevent the default link action
-
-        // Get the current date to append it to the URL query (if needed)
-        const today = new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
-
-        // Redirect to the export-sales route to trigger the download
-        window.location.href = `/export-sales?startDate=${today}&endDate=${today}`;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to mark this order as done?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, mark it as done!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "/orders/mark-done",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ order_no: orderNo }),
+                    success: function (response) {
+                        console.log('Server response:', response);
+                        Swal.fire({
+                            title: 'Success!',
+                            text: response.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function (xhr) {
+                        console.error('AJAX error:', xhr.responseText);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: "An error occurred: " + xhr.responseText,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+        });
     });
-});
+
+    $(document).ready(function() {
+        $('#dailyReportLink').on('click', function(e) {
+            e.preventDefault();
+            const today = new Date().toISOString().split('T')[0];
+            window.location.href = `/export-sales?startDate=${today}&endDate=${today}`;
+        });
+    });
     </script>
 </body>
 

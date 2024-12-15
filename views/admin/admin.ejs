@@ -123,10 +123,6 @@
     var dailySalesData = <%- JSON.stringify(dailySales) %>;
     var weeklySalesData = <%- JSON.stringify(weeklySales) %>;
 
-    // Log the data to check if it's properly loaded
-    console.log('Daily Sales Data:', dailySalesData);
-    console.log('Weekly Sales Data:', weeklySalesData);
-
     document.addEventListener('DOMContentLoaded', function() {
     fetch('/today-sales') // Replace with your endpoint
         .then(response => response.json())
