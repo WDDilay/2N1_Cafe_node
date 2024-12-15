@@ -1,7 +1,7 @@
 const express = require('express');
 require('dotenv').config(); // This loads the .env file
 const jwt = require('jsonwebtoken');
-console.log('JWT Secret:', process.env.JWT_SECRET);
+
 
 const app = express();
 const bodyParser = require('body-parser');

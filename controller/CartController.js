@@ -2,7 +2,6 @@ const cartModel = require('../models/CartModel');
 
 const cartController = {
     addToCart: (req, res) => {
-        console.log('Request body:', req.body);
 
         const { productId, size, quantity, price } = req.body;
 
@@ -34,8 +33,6 @@ const cartController = {
                     console.error('Error adding to cart:', err);
                     return res.status(500).json({ error: 'Failed to add item to cart.' });
                 }
-
-                console.log('Item added to cart successfully:', result);
 
                 res.status(200).json({
                     message: 'Item added to cart successfully.',

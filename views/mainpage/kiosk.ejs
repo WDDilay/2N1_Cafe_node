@@ -336,7 +336,6 @@ function fetchCartItems() {
     fetch('/cart/items') // Fetch cart items from the backend
         .then(response => response.json())
         .then(cartItems => {
-            console.log('Fetched cart items:', cartItems); // Debugging
             updateOrderSummary(cartItems); // Update modal order summary
             updateFooterSummary(cartItems); // Update footer total items & cost
         })
