@@ -1,38 +1,29 @@
-const db = require('./config/db.js'); // Import the database connection
+const bcrypt = require('bcrypt');
+const db = require('./config/db'); // Adjust path to your database connection file
 
-function testInsert() {
-    const orderId = 13;
-    const totalAmount = '129.00';
+async function hashPasswords() {
+    try {
+        // Step 1: Retrieve all users from the database
+        const [users] = await db.query('SELECT user_id, password FROM users');
 
-    // Check if the order_id exists in the orders table
-    const checkOrderQuery = 'SELECT * FROM orders WHERE order_id = ?';
-    
-    db.query(checkOrderQuery, [orderId], (err, orderResults) => {
-        if (err) {
-            console.error('Error checking if order exists:', err);
-            return;
-        }
+        for (const user of users) {
+            if (user.password) {
+                // Step 2: Hash the plain-text password
+                const hashedPassword = await bcrypt.hash(user.password, 10); // 10 salt rounds
 
-        if (orderResults.length === 0) {
-            console.error('Order ID 11 does not exist in the orders table.');
-            return;
-        }
-
-        // If the order exists, proceed with inserting into sales
-        const salesQuery = `
-            INSERT INTO sales (order_id, total_amount, status)
-            VALUES (?, ?, 'Completed')
-        `;
-
-        db.query(salesQuery, [orderId, totalAmount], (err, saleResult) => {
-            if (err) {
-                console.error('Error inserting into sales:', err);
-                return;
+                // Step 3: Update the database with the hashed password
+                await db.query('UPDATE users SET password = ? WHERE user_id = ?', [hashedPassword, user.user_id]);
+                console.log(`Password for user ID ${user.user_id} has been hashed.`);
             }
+        }
 
-            console.log('Inserted into sales, sale_id:', saleResult.insertId);
-        });
-    });
+        console.log('All passwords have been hashed successfully.');
+    } catch (error) {
+        console.error('Error hashing passwords:', error);
+    } finally {
+        db.end(); // Close the database connection
+    }
 }
 
-testInsert();
+// Run the script
+hashPasswords();

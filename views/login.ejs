@@ -5,22 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Login & Registration Form | CoderGirl</title>
-  <!---Custom CSS File--->
   <link rel="stylesheet" href="logregstyle.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <div class="container">
-        <!-- Left Image Section -->
-        <div class="image-section">
-          <img src="2N1.jpg" alt="Left Side Image">
-        </div>
-        
-        <!-- Right Form Inputs Section -->
-        <div class="input-section">
-          <div class="login form">
-            <header>2N1 Cafe</header>
-            <div class="form-content">
-          <form action="/login" method="POST">
+    <div class="image-section">
+      <img src="2N1.jpg" alt="Left Side Image">
+    </div>
+    
+    <div class="input-section">
+      <div class="login form">
+        <header>2N1 Cafe</header>
+        <div class="form-content">
+          <form id="loginForm">
             <input type="email" name="email" placeholder="Enter your email" required>
             <input type="password" name="password" placeholder="Enter your password" required>
             <input type="submit" class="button" value="Login">
@@ -29,5 +27,55 @@
       </div>
     </div>
   </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const email = formData.get('email');
+      const password = formData.get('password');
+
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.setItem('token', data.token);
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: 'You will be redirected shortly.',
+          }).then(() => {
+            if (data.role === 'admin') {
+              window.location.href = '/admin';
+            } else {
+              window.location.href = '/dashboard';
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: data.message,
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+        });
+      }
+    });
+  </script>
 </body>
 </html>
+

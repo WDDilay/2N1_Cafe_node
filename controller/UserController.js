@@ -1,26 +1,32 @@
 const user = require('../models/UserModel.js');
-const u = {
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
+const u = {
     main: (req, res) => {
         res.render('login'); 
     },
 
-    login: (req, res) => {
-        const { email, password } = req.body;
+    login: async (req, res) => {
+        try {
+            const { email, password } = req.body;
+            const foundUser = await user.findByEmail(email);
 
-        user.findByEmail(email, (err, foundUser) => {
-            if (err) {
-                return res.status(500).send("Internal Server Error");
+            if (!foundUser || !(await bcrypt.compare(password, foundUser.password))) {
+                return res.status(401).json({ success: false, message: "Invalid credentials" });
             }
-            if (!foundUser || foundUser.password !== password) {
-                return res.status(401).send("Invalid credentials");
-            }
-            if (foundUser.role === 'admin') {
-                return res.redirect('/admin');
-            } else {
-                res.status(403).send("Access denied");
-            }
-        });
+
+            const token = jwt.sign(
+                { id: foundUser.id, email: foundUser.email, role: foundUser.role },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            res.json({ success: true, token, role: foundUser.role });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
     },
 
     account: (req, res) => {
@@ -29,3 +35,4 @@ const u = {
 };
 
 module.exports = u;
+
